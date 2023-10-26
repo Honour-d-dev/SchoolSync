@@ -3,6 +3,12 @@ pragma solidity ^0.8.17;
 import {Student} from "./Student.sol";
 
 contract SchoolSync {
+    event newStudentRegistration(
+        address indexed _studentAddress,
+        string _name,
+        Student indexed _studentProfile
+    );
+
     struct NewStudent {
         uint id;
         string name;
@@ -74,5 +80,11 @@ contract SchoolSync {
             newStudent.age
         );
         StudentProfile[msg.sender] = newStudentProfile;
+
+        emit newStudentRegistration(
+            newStudent.Address,
+            newStudent.name,
+            newStudentProfile
+        );
     }
 }
