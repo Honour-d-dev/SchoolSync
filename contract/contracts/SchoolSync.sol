@@ -2,13 +2,23 @@
 pragma solidity ^0.8.17;
 import {Student} from "./Student.sol";
 
+/**
+ * @title SchoolSync
+ * @author 3illBaby | Team 4
+ * @notice This contract is still in development
+ */
+
 contract SchoolSync {
+    //! Contract events
+    //? These events are emitted when certain actions are performed in the contract
     event newStudentRegistration(
         address indexed _studentAddress,
         string _name,
         Student indexed _studentProfile
     );
 
+    //! Contract Structs
+    //? This structure is created when a new student is registered
     struct NewStudent {
         uint id;
         string name;
@@ -33,6 +43,7 @@ contract SchoolSync {
         Owner = msg.sender;
     }
 
+    //! Contract Modifiers
     modifier registrationFeeCompliance() {
         require(msg.value >= registrationFee, "Insufficient registration fee");
         _;
