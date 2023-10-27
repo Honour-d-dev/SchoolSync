@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+
+//? This Contract is created and tracked when a student registers
 import {Student} from "./Student.sol";
 
 /**
@@ -24,6 +26,7 @@ contract SchoolSync {
         string name;
         uint age;
         address Address;
+        bool isBlacklisted;
         uint date;
     }
 
@@ -78,6 +81,7 @@ contract SchoolSync {
             name: _name,
             age: _age,
             Address: msg.sender,
+            isBlacklisted: false,
             date: block.timestamp
         });
 
