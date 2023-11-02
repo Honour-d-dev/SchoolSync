@@ -26,6 +26,8 @@ contract SchoolSync {
         string name;
         uint age;
         address Address;
+        string faculty;
+        string department;
         bool isBlacklisted;
         uint date;
     }
@@ -68,6 +70,8 @@ contract SchoolSync {
     //? This function registers a new student and creats a contract profile;
     function studentRegistration(
         string memory _name,
+        string memory _faculty,
+        string memory _department,
         uint _age
     )
         external
@@ -81,6 +85,8 @@ contract SchoolSync {
             name: _name,
             age: _age,
             Address: msg.sender,
+            faculty: _faculty,
+            department: _department,
             isBlacklisted: false,
             date: block.timestamp
         });
