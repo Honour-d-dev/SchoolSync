@@ -84,3 +84,20 @@ export const footerLinks3 = [
     hash: '#faqs',
   },
 ] as const
+
+export const partners = [
+  {
+    name: 'consensys',
+    img: '/icons/partner2.png',
+  },
+
+  {
+    name: 'aya',
+    img: '/icons/partner1.png',
+  },
+
+  {
+    name: 'ethereum',
+    img: '/icons/partner3.png',
+  },
+] as const
