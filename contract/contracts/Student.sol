@@ -2,9 +2,18 @@
 pragma solidity ^0.8.17;
 
 contract Student {
+    struct Session {
+        uint256 level;
+        uint256 numberOfCoursesRegistered;
+        string[] courseRegistratioHashes;
+        string[] firseSemesterHashes;
+        string[] secondSemesterHashes;
+    }
+
     address private immutable Owner;
-    string public name;
+    Session[] private sessions;
     uint public age;
+    string public name;
     string public faculty;
     string public department;
 

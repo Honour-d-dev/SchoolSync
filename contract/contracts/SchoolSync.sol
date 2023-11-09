@@ -18,6 +18,7 @@ contract SchoolSync {
         string _name,
         Student indexed _studentProfile
     );
+    event newAdminCreated(address indexed _adminAddress, string _name);
 
     //! Contract Structs
     //? This structure is created when a new student is registered
@@ -32,7 +33,17 @@ contract SchoolSync {
         uint date;
     }
 
+    struct Admin {
+        uint256 id;
+        string name;
+        address Address;
+        string faculty;
+        string department;
+        uint date;
+    }
+
     uint256 public counter = 0;
+    uint256 public adminCounter = 0;
     uint256 public registrationFee = 0.01 ether;
 
     address private immutable Owner;
@@ -41,6 +52,7 @@ contract SchoolSync {
 
     mapping(address => Student) public StudentProfile;
     mapping(address => NewStudent) public addressToStudent;
+    mapping(address => Admin) public addressToAdmin;
     mapping(address => bool) public isRegistered;
     mapping(address => bool) isAdmin;
 
@@ -64,6 +76,11 @@ contract SchoolSync {
 
     modifier adminCompliance(address _adminAddress) {
         require(isAdmin[_adminAddress], "Only admins can call this function");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == Owner, "only owners can call this function");
         _;
     }
 
@@ -98,7 +115,8 @@ contract SchoolSync {
         Student newStudentProfile = new Student(
             newStudent.Address,
             newStudent.name,
-            newStudent.age
+            newStudent.age,
+            newStudent.department
         );
         StudentProfile[msg.sender] = newStudentProfile;
 
@@ -107,5 +125,28 @@ contract SchoolSync {
             newStudent.name,
             newStudentProfile
         );
+    }
+
+    function registerAdmin(
+        string memory _name,
+        string memory _faculty,
+        string memory _department,
+        address _address
+    ) external onlyOwner adminCompliance(msg.sender) {
+        uint id = adminCounter++;
+        Admin memory newAdmin = Admin({
+            id: id,
+            name: _name,
+            Address: _address,
+            faculty: _faculty,
+            department: _department,
+            date: block.timestamp
+        });
+
+        isAdmin[_address] = true;
+        admins.push(_address);
+        addressToAdmin[_address] = newAdmin;
+
+        emit newAdminCreated(_address, _name);
     }
 }
