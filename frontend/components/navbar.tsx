@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { links } from '@/lib/data';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import Button from './button';
 
 const Navbar = () => {
   const { isActive, setIsActive } = useActiveSectionContext();
@@ -46,15 +47,8 @@ const Navbar = () => {
           </React.Fragment>
         ))}
 
-        <div className=" lg:ml-[150px] md:ml-[50px]">
-          <button
-            className=" bg-accent-400 rounded-[12px] shadow-md shadow-black
-           px-8 py-3 font-OpenSans text-[16px] leading-[32px] tracking-[0.24px] font-medium group hover:scale-110 active:scale-100 transition-all"
-          >
-            <p className=" capitalize group-hover:scale-110 transition-all">
-              get started
-            </p>
-          </button>
+        <div className=" lg:ml-[150px] md:ml-[50px] ">
+          <Button buttonText="Get Started" backgroundColor=" bg-accent-400" />
         </div>
       </div>
     </nav>
