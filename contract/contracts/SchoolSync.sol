@@ -1,152 +1,109 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-
-//? This Contract is created and tracked when a student registers
-import {Student} from "./Student.sol";
-
-/**
- * @title SchoolSync
- * @author 3illBaby | Team 4
- * @notice This contract is still in development
- */
+import {Institution} from "./Instiution.sol";
 
 contract SchoolSync {
-    //! Contract events
-    //? These events are emitted when certain actions are performed in the contract
-    event newStudentRegistration(
-        address indexed _studentAddress,
-        string _name,
-        Student indexed _studentProfile
+    event newInstitutionCreated(
+        address indexed _address,
+        string institutionName
     );
-    event newAdminCreated(address indexed _adminAddress, string _name);
 
-    //! Contract Structs
-    //? This structure is created when a new student is registered
-    struct NewStudent {
-        uint id;
-        string name;
-        uint age;
-        address Address;
-        string faculty;
-        string department;
-        bool isBlacklisted;
-        uint date;
-    }
-
-    struct Admin {
-        uint256 id;
-        string name;
-        address Address;
-        string faculty;
-        string department;
-        uint date;
-    }
-
-    uint256 public counter = 0;
-    uint256 public adminCounter = 0;
-    uint256 public registrationFee = 0.01 ether;
-
-    address private immutable Owner;
-    address[] public admins;
+    address private immutable owner;
     address[] public keys;
 
-    mapping(address => Student) public StudentProfile;
-    mapping(address => NewStudent) public addressToStudent;
-    mapping(address => Admin) public addressToAdmin;
-    mapping(address => bool) public isRegistered;
-    mapping(address => bool) isAdmin;
+    mapping(address => Institution) private allInstiutions;
+    mapping(address => Institution[]) private myInstiutions;
+    mapping(address => bool) hasSubscribed;
+    mapping(address => bool) hasCreatedInstitution;
 
-    constructor() {
-        Owner = msg.sender;
-    }
+    uint256 public subscritptionFee;
+    uint256 public institutionCounter;
+    uint256 public subscribers;
 
-    //! Contract Modifiers
-    modifier registrationFeeCompliance() {
-        require(msg.value >= registrationFee, "Insufficient registration fee");
-        _;
-    }
-
-    modifier registrationCompliance(address _studentAddress) {
-        require(
-            !isRegistered[_studentAddress],
-            "Student has already registered"
-        );
-        _;
-    }
-
-    modifier adminCompliance(address _adminAddress) {
-        require(isAdmin[_adminAddress], "Only admins can call this function");
-        _;
+    constructor(address _owner, uint256 _subscriptionPrice) {
+        owner = _owner;
+        subscritptionFee = _subscriptionPrice;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == Owner, "only owners can call this function");
+        require(msg.sender == owner, "only owner can call this function");
         _;
     }
 
-    //? This function registers a new student and creats a contract profile;
-    function studentRegistration(
-        string memory _name,
-        string memory _faculty,
-        string memory _department,
-        uint _age
-    )
-        external
-        payable
-        registrationCompliance(msg.sender)
-        registrationFeeCompliance
-    {
-        uint id = counter++;
-        NewStudent memory newStudent = NewStudent({
-            id: id,
-            name: _name,
-            age: _age,
-            Address: msg.sender,
-            faculty: _faculty,
-            department: _department,
-            isBlacklisted: false,
-            date: block.timestamp
-        });
-
-        isRegistered[msg.sender] = true;
-        keys.push(msg.sender);
-        addressToStudent[msg.sender] = newStudent;
-
-        Student newStudentProfile = new Student(
-            newStudent.Address,
-            newStudent.name,
-            newStudent.age,
-            newStudent.department
+    modifier blankCompliance(string memory _valueA, string memory _valueB) {
+        require(
+            bytes(_valueA).length > 0 && bytes(_valueB).length > 0,
+            "can't leave parameters empty"
         );
-        StudentProfile[msg.sender] = newStudentProfile;
-
-        emit newStudentRegistration(
-            newStudent.Address,
-            newStudent.name,
-            newStudentProfile
-        );
+        _;
     }
 
-    function registerAdmin(
+    function addInstitution(
+        address _owner,
         string memory _name,
-        string memory _faculty,
-        string memory _department,
-        address _address
-    ) external onlyOwner adminCompliance(msg.sender) {
-        uint id = adminCounter++;
-        Admin memory newAdmin = Admin({
-            id: id,
-            name: _name,
-            Address: _address,
-            faculty: _faculty,
-            department: _department,
-            date: block.timestamp
-        });
+        string memory _description
+    ) internal blankCompliance(_name, _description) {
+        institutionCounter++;
 
-        isAdmin[_address] = true;
-        admins.push(_address);
-        addressToAdmin[_address] = newAdmin;
+        keys.push(msg.sender);
 
-        emit newAdminCreated(_address, _name);
+        Institution institution = new Institution(_owner, _name, _description);
+        allInstiutions[_owner] = institution;
+        myInstiutions[_owner].push(institution);
+
+        emit newInstitutionCreated(_owner, _name);
+    }
+
+    function goPremium() external payable {
+        require(
+            msg.value >= subscritptionFee,
+            "Insufficient amount to complete subscription"
+        );
+        subscribers++;
+        hasSubscribed[msg.sender] = true;
+
+        (bool sent, ) = payable(address(this)).call{value: msg.value}("");
+        require(sent, "This transaction failed");
+    }
+
+    function updateSubscriptionPrice(uint256 _price) external onlyOwner {
+        subscritptionFee = _price;
+    }
+
+    function createInstitution(
+        string memory _name,
+        string memory _description
+    ) external blankCompliance(_name, _description) {
+        if (hasCreatedInstitution[msg.sender]) {
+            if (hasSubscribed[msg.sender]) {
+                addInstitution(msg.sender, _name, _description);
+            } else {
+                require(
+                    myInstiutions[msg.sender].length <= 2,
+                    "Can not have more than 2 institutions with a basic plan"
+                );
+
+                addInstitution(msg.sender, _name, _description);
+            }
+        } else {
+            hasCreatedInstitution[msg.sender] = true;
+            addInstitution(msg.sender, _name, _description);
+        }
+    }
+
+    function getAllInstitutions() external view returns (Institution[] memory) {
+        Institution[] memory allInstiution = new Institution[](
+            institutionCounter
+        );
+
+        for (uint256 i = 0; i < institutionCounter; i++) {
+            allInstiution[i] = allInstiutions[keys[i]];
+        }
+
+        return allInstiution;
+    }
+
+    function getMyInstiution() external view returns (Institution[] memory) {
+        return myInstiutions[msg.sender];
     }
 }
