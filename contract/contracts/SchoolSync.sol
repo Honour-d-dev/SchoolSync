@@ -7,14 +7,15 @@ contract SchoolSync {
         address indexed _address,
         string institutionName
     );
+    event newSubscription(address indexed _address, uint256 _amount);
 
     address private immutable owner;
     address[] public keys;
 
     mapping(address => Institution) private allInstiutions;
     mapping(address => Institution[]) private myInstiutions;
-    mapping(address => bool) hasSubscribed;
-    mapping(address => bool) hasCreatedInstitution;
+    mapping(address => bool) public hasSubscribed;
+    mapping(address => bool) public hasCreatedInstitution;
 
     uint256 public subscritptionFee;
     uint256 public institutionCounter;
@@ -38,6 +39,13 @@ contract SchoolSync {
         _;
     }
 
+    //? This function is called by the createInstiution function
+    /**
+     * This allows users to complete institution creation
+     * @param _owner this is the address creating the instiution
+     * @param _name this is the name of the instiution
+     * @param _description this is the description of the instiution
+     */
     function addInstitution(
         address _owner,
         string memory _name,
@@ -54,6 +62,7 @@ contract SchoolSync {
         emit newInstitutionCreated(_owner, _name);
     }
 
+    //? This function allows users to upgrade their subscription tier
     function goPremium() external payable {
         require(
             msg.value >= subscritptionFee,
@@ -66,10 +75,17 @@ contract SchoolSync {
         require(sent, "This transaction failed");
     }
 
+    //? This function allows the deployer of the contract to update the subscription fee
     function updateSubscriptionPrice(uint256 _price) external onlyOwner {
         subscritptionFee = _price;
     }
 
+    //? Users call this function to create a new instiution
+    /**
+     * @dev Users with a basic subscription tier can not create more than 2 institution instances
+     * @param _name this is the name of the instiution
+     * @param _description this is the description of the instiution
+     */
     function createInstitution(
         string memory _name,
         string memory _description
@@ -91,6 +107,7 @@ contract SchoolSync {
         }
     }
 
+    //? This function returns an array of all created institutions
     function getAllInstitutions() external view returns (Institution[] memory) {
         Institution[] memory allInstiution = new Institution[](
             institutionCounter
@@ -103,6 +120,7 @@ contract SchoolSync {
         return allInstiution;
     }
 
+    //? This function returns an array of user created instiutions
     function getMyInstiution() external view returns (Institution[] memory) {
         return myInstiutions[msg.sender];
     }
