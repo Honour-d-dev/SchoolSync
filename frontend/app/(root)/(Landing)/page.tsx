@@ -60,6 +60,7 @@ const Page = () => {
         </section>
       </div>
 
+      {/**Partners Section */}
       <section className=" flex flex-col w-full h-[160px] bg-primary-200 padding-x mt-[300px] ">
         <div className="flex mt-[20px]">
           <h3 className=" font-Inconsolata text-[24px] font-semibold leading-[36px] tracking-[0.24px]">
@@ -82,11 +83,12 @@ const Page = () => {
         </div>
       </section>
 
-      <div className="mt-3 padding">
+      {/**Features Section */}
+      <section className="mt-3 padding">
         <h1 className=" font-Inconsolata text-[24px] font-semibold leading-[36px] tracking-[0.24px]">
           Features
         </h1>
-      </div>
+      </section>
     </section>
   );
 };
