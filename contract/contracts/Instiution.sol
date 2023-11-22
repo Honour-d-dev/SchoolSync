@@ -19,6 +19,7 @@ contract Institution {
         Student indexed _studentProfile
     );
     event newAdminCreated(address indexed _adminAddress, string _name);
+    event studentVerified(address indexed _studentAddress, string _name);
 
     //! Contract Structs
     //? This structure is created when a new student is registered
@@ -42,6 +43,13 @@ contract Institution {
         uint date;
     }
 
+    struct Verification {
+        string birthCertificateHash;
+        string waecResultHash;
+        string highSchoolCertificateHash;
+        string stateOfOriginHash;
+    }
+
     string public instiutionName;
     string public description;
 
@@ -52,12 +60,14 @@ contract Institution {
     address private immutable Owner;
     address[] public admins;
     address[] public keys;
+    address[] private clearedStudents;
 
     mapping(address => Student) public StudentProfile;
     mapping(address => NewStudent) public addressToStudent;
     mapping(address => Admin) public addressToAdmin;
     mapping(address => bool) public isRegistered;
-    mapping(address => bool) isAdmin;
+    mapping(address => bool) public isAdmin;
+    mapping(address => Verification) public verifiedStudents;
 
     constructor(
         address _ownerAddress,

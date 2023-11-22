@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className=" font-OpenSans">
+      <body className=" font-OpenSans scroll-smooth overflow-x-hidden">
         <ActiveSectionContextProvider>{children}</ActiveSectionContextProvider>
       </body>
     </html>

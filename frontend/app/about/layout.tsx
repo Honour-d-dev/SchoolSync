@@ -15,3 +15,5 @@ const layout = ({ children }: childrenProps) => {
     </>
   );
 };
+
+export default layout;

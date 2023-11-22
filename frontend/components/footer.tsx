@@ -61,7 +61,7 @@ const Footer = () => {
                   href={link.hash}
                   onClick={() => setIsFooter2Active(link.name)}
                 >
-                  <p className=" text-[24px] md:text-[18px] font-semibold font-Inconsolata leading-[36px] tracking-[0.24px] hover:scale-105 active:scale-100 hover:text-white hover:translate-x-1 transition-all">
+                  <p className=" lg:text-[24px] md:text-[18px] font-semibold font-Inconsolata leading-[36px] tracking-[0.24px] hover:scale-105 active:scale-100 hover:text-white hover:translate-x-1 transition-all">
                     {link.name}
                   </p>
                 </Link>
@@ -78,7 +78,7 @@ const Footer = () => {
                   href={link.hash}
                   onClick={() => setIsFooter3Active(link.name)}
                 >
-                  <p className=" text-[24px] md:text-[18px] font-semibold font-Inconsolata leading-[36px] tracking-[0.24px] hover:scale-105 active:scale-100 hover:text-white hover:translate-x-1 transition-all">
+                  <p className=" lg:text-[24px] md:text-[18px] font-semibold font-Inconsolata leading-[36px] tracking-[0.24px] hover:scale-105 active:scale-100 hover:text-white hover:translate-x-1 transition-all">
                     {link.name}
                   </p>
                 </Link>

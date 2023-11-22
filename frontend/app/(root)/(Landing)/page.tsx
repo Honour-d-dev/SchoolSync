@@ -1,11 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import Button from '@/components/button';
+import LearnMoreButton from '@/components/LearnMoreButton';
+import FeatureCard from '@/components/FeatureCard';
+import AboutPreview from '@/components/AboutPreview';
+import ReviewCard from '@/components/ReviewCard';
+import Faq from '@/components/Faq';
 import { partners } from '@/lib/data';
 
 const Page = () => {
   return (
-    <section className=" flex flex-col min-h-screen">
+    <section id="home" className=" flex flex-col">
       <div className="lg:flex lg:flex-row md:flex md:flex-col gap-1 padding ">
         <section className="flex flex-col gap-3">
           <h1 className="capitalize lg:max-w-[900px] md:text-[50px] lg:max-h-[470px] text-secondary_text font-bold lg:leading-[120px] lg:text-[80px] ">
@@ -20,18 +25,7 @@ const Page = () => {
           <div className="flex flex-row gap-x-[24px] mt-[40px] ">
             <Button buttonText="Get Started" backgroundColor="bg-accent-400" />
 
-            <button className="flex flex-row items-center group hover:scale-110 active:scale-105 transition-all">
-              <p className=" font-OpenSans text-[16px] font-normal text-secondary_text leading-[32px] tracking-[0.2px]  ">
-                Learn More
-              </p>
-              <Image
-                src="/icons/ArrowUp.png"
-                alt="arrow_icon"
-                width={50}
-                height={50}
-                className="group-hover:translate-x-1 group-hover:-translate-y-2 transition-all"
-              />
-            </button>
+            <LearnMoreButton />
           </div>
         </section>
 
@@ -84,10 +78,67 @@ const Page = () => {
       </section>
 
       {/**Features Section */}
-      <section className="mt-3 padding">
+      <section className="mt-3 padding flex flex-col">
         <h1 className=" font-Inconsolata text-[24px] font-semibold leading-[36px] tracking-[0.24px]">
           Features
         </h1>
+        <div className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px]  padding-x ">
+          <FeatureCard
+            img="/icons/Feature1.png"
+            title="Secure record-keeping"
+            description="Ensures that student data is protected from unauthorized access or tampering, offering peace of mind for both schools and families."
+          />
+          <div className="lg:mt-[280px]  flex items-center">
+            <FeatureCard
+              img="/icons/Feature2.png"
+              title="Streamlined processes"
+              description="Streamlined processes automate and simplify administrative tasks, reducing time and resources required for tasks like enrolment, clearance, and acceptance, making school operations more efficient."
+            />
+          </div>
+        </div>
+
+        <div className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px] lg:mt-[-100px] md:mt-[100px]  padding-x ">
+          <FeatureCard
+            img="/icons/Feature3.png"
+            title="Decentralized storage"
+            description="Student records are not stored in a single, vulnerable location, enhancing data security and ensuring that records remain accessible even in case of system failures."
+          />
+          <div className="lg:mt-[280px]   flex items-center">
+            <FeatureCard
+              img="/icons/Feature4.png"
+              title="NFT services"
+              description="Providing unique digital tokens for academic achievements, creating a verifiable and tradable record of a student's accomplishments, thereby offering a modern and innovative approach to recognizing achievements"
+            />
+          </div>
+        </div>
+
+        <div className=" lg:flex lg:flex-row md:flex md:flex-col lg:mt-[100px] md:mt-[100px]  gap-[54px] padding-x ">
+          <FeatureCard
+            img="/icons/Feature4.png"
+            title="NFT services"
+            description="Providing unique digital tokens for academic achievements, creating a verifiable and tradable record of a student's accomplishments, thereby offering a modern and innovative approach to recognizing achievements"
+          />
+        </div>
+      </section>
+
+      {/**About Preview */}
+      <section id="about" className="padding-x py-[118px]">
+        <AboutPreview />
+      </section>
+
+      {/**Review Sections */}
+      <section className=" w-full h-[900px] bg-review object-contain bg-cover flex  justify-center items-center md:overflow-x-hidden">
+        <ReviewCard />
+      </section>
+
+      {/**FAQs */}
+      <section className="w-full h-[600px] padding-x flex flex-col">
+        <p className="text-[24px] mt-[24px] font-bold font-Inconsolata leading-[36px] tracking-[0.24px] ">
+          FAQs
+        </p>
+        <div className="flex flex-col mt-[48px] self-center">
+          <Faq />
+        </div>
       </section>
     </section>
   );

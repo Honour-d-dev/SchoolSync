@@ -62,6 +62,7 @@ const config: Config = {
 
       backgroundImage: {
         footer: "url('/images/FooterBanner.jpeg')",
+        review: "url('/images/ReviewFrame.jpg')",
       },
     },
   },

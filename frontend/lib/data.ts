@@ -1,7 +1,7 @@
 export const links = [
   {
     name: 'Home',
-    hash: '#home',
+    hash: '/',
   },
 
   {
@@ -99,5 +99,51 @@ export const partners = [
   {
     name: 'ethereum',
     img: '/icons/partner3.png',
+  },
+] as const
+
+export const stars = [
+  {
+    name: 'star1',
+    img: '/images/Star.svg',
+  },
+  {
+    name: 'star2',
+    img: '/images/Star.svg',
+  },
+  {
+    name: 'star3',
+    img: '/images/Star.svg',
+  },
+  {
+    name: 'star4',
+    img: '/images/Star.svg',
+  },
+  {
+    name: 'star5',
+    img: '/images/Star.svg',
+  },
+]
+
+export const FAQs = [
+  {
+    id: 1,
+    question:
+      'Is the use of blockchain technology in the system secure for student data?',
+  },
+  {
+    id: 2,
+    question:
+      'How does a decentralized system improve transparency in school operations?',
+  },
+  {
+    id: 3,
+    question:
+      'Can NFT services be integrated into the school management system, and what are their benefits?',
+  },
+  {
+    id: 4,
+    question:
+      'How does the system streamline administrative processes such as clearance and acceptance?',
   },
 ] as const
