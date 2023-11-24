@@ -48,7 +48,11 @@ const Page = () => {
           </motion.h3>
 
           <div className="flex flex-row gap-x-[24px] mt-[40px] ">
-            <Button buttonText="Get Started" backgroundColor="bg-accent-400" />
+            <Button
+              buttonText="Get Started"
+              backgroundColor="bg-accent-400"
+              linkTo="/sign-up"
+            />
 
             <LearnMoreButton />
           </div>
