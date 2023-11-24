@@ -27,6 +27,8 @@ const config: Config = {
       fontFamily: {
         OpenSans: ['Open Sans', 'sans-serif'],
         Inconsolata: ['Inconsolata', 'monospace'],
+        Tomorrow: ['Tomorrow', 'sans-serif'],
+        SpaceGrotesk: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
         primary_text: '#050200',
@@ -63,6 +65,7 @@ const config: Config = {
       backgroundImage: {
         footer: "url('/images/FooterBanner.jpeg')",
         review: "url('/images/ReviewFrame.jpg')",
+        signUp: "url('/images/signUpWallpaper.png')",
       },
     },
   },

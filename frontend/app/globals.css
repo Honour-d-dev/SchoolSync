@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,5 +34,13 @@
 
   .padding-b {
     @apply sm:pb-24 pb-12;
+  }
+
+  .signUpCard {
+    background: linear-gradient(
+      212deg,
+      #f8f7f6 -7.58%,
+      rgba(170, 194, 227, 0.2) 104.54%
+    );
   }
 }

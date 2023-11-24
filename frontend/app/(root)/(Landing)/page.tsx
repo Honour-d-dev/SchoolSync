@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { motion, stagger } from 'framer-motion';
 import Image from 'next/image';
 import Button from '@/components/button';
 import LearnMoreButton from '@/components/LearnMoreButton';
@@ -7,20 +10,42 @@ import AboutPreview from '@/components/AboutPreview';
 import ReviewCard from '@/components/ReviewCard';
 import Faq from '@/components/Faq';
 import { partners } from '@/lib/data';
+import { staggerContainer } from '@/lib/motion';
 
 const Page = () => {
   return (
-    <section id="home" className=" flex flex-col">
+    <motion.section
+      variants={staggerContainer as any}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.25 }}
+      id="home"
+      className=" flex flex-col"
+    >
       <div className="lg:flex lg:flex-row md:flex md:flex-col gap-1 padding ">
         <section className="flex flex-col gap-3">
-          <h1 className="capitalize lg:max-w-[900px] md:text-[50px] lg:max-h-[470px] text-secondary_text font-bold lg:leading-[120px] lg:text-[80px] ">
+          <motion.h1
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.75,
+            }}
+            className="capitalize lg:max-w-[900px] md:text-[50px] lg:max-h-[470px] text-secondary_text font-bold lg:leading-[120px] lg:text-[80px] "
+          >
             Unlock the Future of School Management with Blockchain Technology
-          </h1>
-          <h3 className=" capitalize lg:max-w-[500px] lg:max-h-[72px] lg:text-[16px] leading-[24px] tracking-[0.16px] font-OpenSans font-normal">
+          </motion.h1>
+          <motion.h3
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 0.85,
+            }}
+            className=" capitalize lg:max-w-[500px] lg:max-h-[72px] lg:text-[16px] leading-[24px] tracking-[0.16px] font-OpenSans font-normal"
+          >
             Streamline Student Records, Enhance Security, and Simplify Processes
             on Our Innovative School Management System. Experience the Future
             Today!
-          </h3>
+          </motion.h3>
 
           <div className="flex flex-row gap-x-[24px] mt-[40px] ">
             <Button buttonText="Get Started" backgroundColor="bg-accent-400" />
@@ -63,8 +88,25 @@ const Page = () => {
         </div>
 
         <div className="flex flex-row gap-[228px] self-center">
-          {partners.map((partner) => (
-            <React.Fragment key={partner.name}>
+          {partners.map((partner, index) => (
+            <motion.div
+              initial={{
+                opacity: 0,
+                x: -100,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              transition={{
+                type: 'spring',
+                delay: index * 0.5,
+                duration: 0.75,
+                ease: 'easeOut',
+              }}
+              whileInView="show"
+              key={partner.name}
+            >
               <Image
                 src={partner.img}
                 alt={partner.name}
@@ -72,7 +114,7 @@ const Page = () => {
                 height={72}
                 quality={95}
               />
-            </React.Fragment>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -140,7 +182,7 @@ const Page = () => {
           <Faq />
         </div>
       </section>
-    </section>
+    </motion.section>
   );
 };
 
