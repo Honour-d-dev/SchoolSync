@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, stagger } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Button from '@/components/button';
 import LearnMoreButton from '@/components/LearnMoreButton';
@@ -51,7 +51,7 @@ const Page = () => {
             <Button
               buttonText="Get Started"
               backgroundColor="bg-accent-400"
-              linkTo="/sign-up"
+              linkTo="/get-started"
             />
 
             <LearnMoreButton />
