@@ -54,7 +54,7 @@ const Navbar = () => {
 
         <div className=" lg:ml-[150px] md:ml-[50px] md:pb-3 ">
           <Button
-            linkTo="/sign-up"
+            linkTo="/get-started"
             buttonText="Get Started"
             backgroundColor=" bg-accent-400"
           />

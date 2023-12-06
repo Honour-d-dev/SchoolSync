@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import ActiveSectionContextProvider from '@/context/active-section-context';
+import { EdgeStoreProvider } from '@/lib/edgestore';
 
 export const metadata: Metadata = {
   title: 'School Sync',
@@ -15,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className=" font-OpenSans scroll-smooth overflow-x-hidden">
-        <ActiveSectionContextProvider>{children}</ActiveSectionContextProvider>
+        <EdgeStoreProvider>
+          <ActiveSectionContextProvider>
+            {children}
+          </ActiveSectionContextProvider>
+        </EdgeStoreProvider>
       </body>
     </html>
   );

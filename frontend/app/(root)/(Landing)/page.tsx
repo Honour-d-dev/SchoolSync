@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { MotionDiv } from '@/components/MotionDiv';
 import Image from 'next/image';
 import Button from '@/components/button';
 import LearnMoreButton from '@/components/LearnMoreButton';
@@ -11,6 +12,11 @@ import ReviewCard from '@/components/ReviewCard';
 import Faq from '@/components/Faq';
 import { partners } from '@/lib/data';
 import { staggerContainer } from '@/lib/motion';
+
+const variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
 
 const Page = () => {
   return (
@@ -93,32 +99,26 @@ const Page = () => {
 
         <div className="flex flex-row gap-[228px] self-center">
           {partners.map((partner, index) => (
-            <motion.div
-              initial={{
-                opacity: 0,
-                x: -100,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
+            <MotionDiv
+              variants={variants}
+              initial="hidden"
+              animate="visible"
               transition={{
-                type: 'spring',
-                delay: index * 0.5,
-                duration: 0.75,
-                ease: 'easeOut',
+                delay: index * 0.25,
+                ease: 'easeInOut',
+                duration: 0.5,
               }}
-              whileInView="show"
-              key={partner.name}
+              viewport={{ amount: 0.5, once: false }}
             >
               <Image
+                key={partner.name}
                 src={partner.img}
                 alt={partner.name}
                 width={144}
                 height={72}
                 quality={95}
               />
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
       </section>
@@ -128,7 +128,18 @@ const Page = () => {
         <h1 className=" font-Inconsolata text-[24px] font-semibold leading-[36px] tracking-[0.24px]">
           Features
         </h1>
-        <div className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px]  padding-x ">
+        <MotionDiv
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          transition={{
+            delay: 0.75,
+            ease: 'easeInOut',
+            duration: 0.5,
+          }}
+          viewport={{ amount: 0.5, once: false }}
+          className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px]  padding-x "
+        >
           <FeatureCard
             img="/icons/Feature1.png"
             title="Secure record-keeping"
@@ -141,9 +152,20 @@ const Page = () => {
               description="Streamlined processes automate and simplify administrative tasks, reducing time and resources required for tasks like enrolment, clearance, and acceptance, making school operations more efficient."
             />
           </div>
-        </div>
+        </MotionDiv>
 
-        <div className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px] lg:mt-[-100px] md:mt-[100px]  padding-x ">
+        <MotionDiv
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          transition={{
+            delay: 0.75,
+            ease: 'easeInOut',
+            duration: 0.5,
+          }}
+          viewport={{ amount: 0.5, once: false }}
+          className=" lg:flex lg:flex-row md:flex md:flex-col gap-[54px] lg:mt-[-100px] md:mt-[100px]  padding-x "
+        >
           <FeatureCard
             img="/icons/Feature3.png"
             title="Decentralized storage"
@@ -156,15 +178,26 @@ const Page = () => {
               description="Providing unique digital tokens for academic achievements, creating a verifiable and tradable record of a student's accomplishments, thereby offering a modern and innovative approach to recognizing achievements"
             />
           </div>
-        </div>
+        </MotionDiv>
 
-        <div className=" lg:flex lg:flex-row md:flex md:flex-col lg:mt-[100px] md:mt-[100px]  gap-[54px] padding-x ">
+        <MotionDiv
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          transition={{
+            delay: 0.75,
+            ease: 'easeInOut',
+            duration: 0.5,
+          }}
+          viewport={{ amount: 0.5, once: false }}
+          className=" lg:flex lg:flex-row md:flex md:flex-col lg:mt-[100px] md:mt-[100px]  gap-[54px] padding-x "
+        >
           <FeatureCard
             img="/icons/Feature4.png"
             title="NFT services"
             description="Providing unique digital tokens for academic achievements, creating a verifiable and tradable record of a student's accomplishments, thereby offering a modern and innovative approach to recognizing achievements"
           />
-        </div>
+        </MotionDiv>
       </section>
 
       {/**About Preview */}

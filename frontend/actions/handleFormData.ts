@@ -2,11 +2,11 @@
 
 import { handleFormValidate } from '@/lib/utils'
 
-export const handleFormData = async (data: FormData) => {
+export const handleStudentFormData = async (data: FormData, url: string) => {
   const name = data.get('fullName')
   const email = data.get('email')
   const school = data.get('school')
-  const image = data.get('image')
+  const image = url
 
   if (
     !handleFormValidate({
@@ -19,5 +19,6 @@ export const handleFormData = async (data: FormData) => {
       error: 'validation error',
     }
   }
-  console.log(name, email, school)
+
+  console.log(name, email, school, image)
 }

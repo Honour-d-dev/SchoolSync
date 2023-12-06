@@ -1,8 +1,44 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import SignUpButton from '@/components/SignUpButton';
+import { useActiveSectionContext } from '@/context/active-section-context';
+import { cn } from '@/lib/utils';
 
 const Page = () => {
+  const {
+    isStaffClicked,
+    isSchoolClicked,
+    isStudentClicked,
+    setIsStaffClicked,
+    setIsSchoolClicked,
+    setIsStudentClicked,
+    setIsButtonEnabled,
+  } = useActiveSectionContext();
+
+  const handleStudentClicked = () => {
+    setIsStaffClicked(false);
+    setIsSchoolClicked(false);
+    setIsStudentClicked((prevIsStudentClicked) => !prevIsStudentClicked);
+    setIsButtonEnabled(true);
+    console.log(isStudentClicked);
+  };
+
+  const handleStaffClicked = () => {
+    setIsSchoolClicked(false);
+    setIsStudentClicked(false);
+    setIsButtonEnabled(true);
+    setIsStaffClicked((prevIsStaffClicked) => !prevIsStaffClicked);
+  };
+
+  const handleSchoolClicked = () => {
+    setIsStaffClicked(false);
+    setIsStudentClicked(false);
+    setIsButtonEnabled(true);
+    setIsSchoolClicked((prevIsSchoolClicked) => !prevIsSchoolClicked);
+  };
+
   return (
     <section className="flex flex-col padding bg-signUp bg-contain bg-center h-screen">
       <div className="flex self-end flex-col w-[540px] h-[645px] rounded-[12px] signUpCard  ">
@@ -22,21 +58,33 @@ const Page = () => {
           </p>
 
           <div className="flex flex-col gap-[36px] mt-[40px]">
-            <SignUpButton
-              text="School Staff"
-              background=" bg-white"
-              fontStyle="font-normal"
-            />
-            <SignUpButton
-              text="Student"
-              background=" bg-white"
-              fontStyle="font-normal"
-            />
-            <SignUpButton
-              text="School Admin"
-              background=" bg-white"
-              fontStyle="font-normal"
-            />
+            <button
+              className={cn(
+                isStaffClicked ? 'bg-primary-200 ' : 'bg-white',
+                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+              )}
+              onClick={handleStaffClicked}
+            >
+              School Staff
+            </button>
+            <button
+              className={cn(
+                isStudentClicked ? 'bg-primary-200 ' : 'bg-white',
+                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+              )}
+              onClick={handleStudentClicked}
+            >
+              Student
+            </button>
+            <button
+              className={cn(
+                isSchoolClicked ? 'bg-primary-200 ' : 'bg-white',
+                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+              )}
+              onClick={handleSchoolClicked}
+            >
+              School Admin
+            </button>
 
             <div className="mt-[60px]">
               <SignUpButton

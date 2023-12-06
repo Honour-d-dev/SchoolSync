@@ -15,6 +15,14 @@ type ActiveSectionType = {
   setIsFooter2Active: React.Dispatch<React.SetStateAction<footer2>>;
   footer3Active: footer3;
   setIsFooter3Active: React.Dispatch<React.SetStateAction<footer3>>;
+  isStaffClicked: boolean;
+  setIsStaffClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isStudentClicked: boolean;
+  setIsStudentClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isSchoolClicked: boolean;
+  setIsSchoolClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  isButtonEnabled: boolean;
+  setIsButtonEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ActiveSectionContext = createContext<ActiveSectionType | null>(null);
@@ -27,6 +35,10 @@ const ActiveSectionContextProvider = ({
   const [footer2Active, setIsFooter2Active] = useState<footer2>('Pricing');
   const [footer3Active, setIsFooter3Active] =
     useState<footer3>('Privacy Policy');
+  const [isStaffClicked, setIsStaffClicked] = useState<boolean>(false);
+  const [isStudentClicked, setIsStudentClicked] = useState<boolean>(false);
+  const [isSchoolClicked, setIsSchoolClicked] = useState<boolean>(false);
+  const [isButtonEnabled, setIsButtonEnabled] = useState<boolean>(false);
 
   return (
     <ActiveSectionContext.Provider
@@ -39,6 +51,14 @@ const ActiveSectionContextProvider = ({
         setIsFooter2Active,
         footer3Active,
         setIsFooter3Active,
+        isStaffClicked,
+        setIsStaffClicked,
+        isStudentClicked,
+        setIsStudentClicked,
+        isSchoolClicked,
+        setIsSchoolClicked,
+        isButtonEnabled,
+        setIsButtonEnabled,
       }}
     >
       {children}
