@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useActiveSectionContext } from '@/context/active-section-context';
-import { footerLinks1, footerLinks2, footerLinks3 } from '@/lib/data';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useActiveSectionContext } from "@/context/active-section-context";
+import { footerLinks1, footerLinks2, footerLinks3 } from "@/lib/data";
 
 const Footer = () => {
   const { setIsFooterActive, setIsFooter2Active, setIsFooter3Active } =
@@ -35,7 +35,7 @@ const Footer = () => {
         </div>
       </section>
 
-      <section className="flex flex-row items-center gap-[100px] mt-7">
+      <section className="flex flex-row items-center gap-4 px-2 md:gap-[100px] mt-7">
         <div className="flex flex-col gap-[20px] border-t-2 border-black">
           {footerLinks1.map((link, index) => (
             <React.Fragment key={index}>

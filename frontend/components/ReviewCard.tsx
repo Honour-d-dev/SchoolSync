@@ -1,22 +1,22 @@
-import React from 'react';
-import Image from 'next/image';
-import { stars } from '@/lib/data';
+import React from "react";
+import Image from "next/image";
+import { stars } from "@/lib/data";
 
 const ReviewCard = () => {
   return (
-    <div className=" flex flex-col lg:w-[1236px] md:w-[1000px] h-[480px] bg-gray-200   rounded-[40px] padding-x">
+    <div className=" flex flex-col lg:w-[1236px] md:w-[1000px] h-fit bg-gray-200 rounded-[40px] p-8 bg-white/25">
       <h1 className=" text-[24px] font-Inconsolata font-semibold leading-[36px] tracking-[0.24px] mt-[20px]">
         Our Users Reviews
       </h1>
 
-      <div className="flex flex-row gap-[80px] mt-[52px]">
+      <div className="flex flex-row gap-10 md:gap-[80px] mt-10 items-start">
         <Image
           src="/images/Registrar.png"
           alt="review"
-          width={320}
-          height={200}
+          width={360}
+          height={240}
           quality={95}
-          className="rounded-[20px]"
+          className="rounded-3xl h-[240px] w-[360px]"
         />
 
         <div className="flex flex-col">

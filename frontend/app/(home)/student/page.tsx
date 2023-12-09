@@ -26,7 +26,6 @@ export default function Student() {
         } absolute top-4 left-4`}
         onClick={() => setShowMenu((p) => !p)}
       >
-        {" "}
         <AlignJustify />
       </button>
       {/* side menu */}
