@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { MotionDiv } from '@/components/MotionDiv';
-import Image from 'next/image';
-import Button from '@/components/button';
-import LearnMoreButton from '@/components/LearnMoreButton';
-import FeatureCard from '@/components/FeatureCard';
-import AboutPreview from '@/components/AboutPreview';
-import ReviewCard from '@/components/ReviewCard';
-import Faq from '@/components/Faq';
-import { partners } from '@/lib/data';
-import { staggerContainer } from '@/lib/motion';
+import React from "react";
+import { motion } from "framer-motion";
+import { MotionDiv } from "@/components/MotionDiv";
+import Image from "next/image";
+import Button from "@/components/button";
+import LearnMoreButton from "@/components/LearnMoreButton";
+import FeatureCard from "@/components/FeatureCard";
+import AboutPreview from "@/components/AboutPreview";
+import ReviewCard from "@/components/ReviewCard";
+import Faq from "@/components/Faq";
+import { partners } from "@/lib/data";
+import { staggerContainer } from "@/lib/motion";
 
 const variants = {
   hidden: { opacity: 0 },
@@ -100,18 +100,18 @@ const Page = () => {
         <div className="flex flex-row gap-[228px] self-center">
           {partners.map((partner, index) => (
             <MotionDiv
+              key={partner.name}
               variants={variants}
               initial="hidden"
               animate="visible"
               transition={{
                 delay: index * 0.25,
-                ease: 'easeInOut',
+                ease: "easeInOut",
                 duration: 0.5,
               }}
               viewport={{ amount: 0.5, once: false }}
             >
               <Image
-                key={partner.name}
                 src={partner.img}
                 alt={partner.name}
                 width={144}
@@ -134,7 +134,7 @@ const Page = () => {
           animate="visible"
           transition={{
             delay: 0.75,
-            ease: 'easeInOut',
+            ease: "easeInOut",
             duration: 0.5,
           }}
           viewport={{ amount: 0.5, once: false }}
@@ -160,7 +160,7 @@ const Page = () => {
           animate="visible"
           transition={{
             delay: 0.75,
-            ease: 'easeInOut',
+            ease: "easeInOut",
             duration: 0.5,
           }}
           viewport={{ amount: 0.5, once: false }}
@@ -186,7 +186,7 @@ const Page = () => {
           animate="visible"
           transition={{
             delay: 0.75,
-            ease: 'easeInOut',
+            ease: "easeInOut",
             duration: 0.5,
           }}
           viewport={{ amount: 0.5, once: false }}

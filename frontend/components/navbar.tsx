@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useActiveSectionContext } from '@/context/active-section-context';
-import Image from 'next/image';
+import React from "react";
+import { useActiveSectionContext } from "@/context/active-section-context";
+import Image from "next/image";
 
-import { links } from '@/lib/data';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import Button from './button';
+import { links } from "@/lib/data";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import Button from "./button";
 
 const Navbar = () => {
   const { isActive, setIsActive } = useActiveSectionContext();
 
   return (
-    <nav className="flex flex-row lg:gap-[750px] md:gap-[100px]  bg-primary-100 padding-x gap">
+    <nav className="flex flex-col md:flex-row md:justify-between gap-4  bg-primary-100 w-full px-4 lg:px-8">
       <Link href="/" className="flex flex-col gap-1 items-center p-2">
         <Image
           src="/icons/logo.png"
@@ -27,22 +27,22 @@ const Navbar = () => {
         </p>
       </Link>
 
-      <div className="flex flex-row lg:gap-[40px] md:gap-[20px] items-center mt-[50px] ">
+      <div className="flex flex-row lg:gap-[40px] md:gap-[20px] items-center md:mt-[50px] gap-2 justify-evenly">
         {links.map((link) => (
           <React.Fragment key={link.name}>
-            <ul className=" font-Inconsolata text-[16px] font-semibold leading-[32px] tracking-[0.16px] group scroll-smooth">
+            <ul className=" font-Inconsolata text-[16px] font-semibold leading-[32px] tracking-[0.16px] group scroll-smooth whitespace-nowrap">
               <Link
                 href={link.hash}
                 onClick={() => setIsActive(link.name)}
                 className="scroll-smooth transition-all"
               >
-                {' '}
+                {" "}
                 <p
                   className={cn(
                     isActive === link.name
-                      ? 'text-accent-400 font-semibold'
-                      : 'text-black',
-                    'group-hover:text-accent-400'
+                      ? "text-accent-400 font-semibold"
+                      : "text-black",
+                    "group-hover:text-accent-400"
                   )}
                 >
                   {link.name}
@@ -52,7 +52,7 @@ const Navbar = () => {
           </React.Fragment>
         ))}
 
-        <div className=" lg:ml-[150px] md:ml-[50px] md:pb-3 ">
+        <div className=" whitespace-nowrap hidden md:block">
           <Button
             linkTo="/get-started"
             buttonText="Get Started"
