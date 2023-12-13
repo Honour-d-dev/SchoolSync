@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import SignUpButton from '@/components/SignUpButton';
-import { useActiveSectionContext } from '@/context/active-section-context';
-import { cn } from '@/lib/utils';
+import React from "react";
+import Image from "next/image";
+import SignUpButton from "@/components/SignUpButton";
+import { useActiveSectionContext } from "@/context/active-section-context";
+import { cn } from "@/lib/utils";
 
 const Page = () => {
   const {
@@ -40,16 +40,16 @@ const Page = () => {
   };
 
   return (
-    <section className="flex flex-col padding bg-signUp bg-contain bg-center h-screen">
-      <div className="flex self-end flex-col w-[540px] h-[645px] rounded-[12px] signUpCard  ">
-        <div className="flex flex-row  items-center  gap-2">
+    <section className="flex flex-col padding bg-signUp bg-center h-screen w-screen bg-no-repeat">
+      <div className="flex self-end flex-col max-w-[540px] max-h-[645px] w-[80vw] min-w-fit rounded-[12px] signUpCard  ">
+        <div className="flex flex-row  items-center  md:gap-2">
           <Image src="/icons/logo.png" alt="logo" width={100} height={100} />
           <h1 className="text-[32px] font-Tomorrow font-semibold leading-[32px] tracking-[0.32px] text-[#1C364D]">
             SchoolSync
           </h1>
         </div>
 
-        <div className="flex flex-col pl-[70px]">
+        <div className="flex flex-col pl-[40px] md:pl-[70px] p-2">
           <h1 className="text-[36px] font-semibold font-Inconsolata leading-[36px] tracking-[0.36px] text-secondary_text">
             Sign Up
           </h1>
@@ -57,11 +57,11 @@ const Page = () => {
             New to Payclick, create an account with few clicks
           </p>
 
-          <div className="flex flex-col gap-[36px] mt-[40px]">
+          <div className="flex flex-col gap-[36px] md:mt-[40px] mt-[25px] p-4">
             <button
               className={cn(
-                isStaffClicked ? 'bg-primary-200 ' : 'bg-white',
-                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+                isStaffClicked ? "bg-primary-200 " : "bg-white",
+                "text-center hover:scale-105 active:scale-105 transition-all py-[12px] px-[4px]  border-secondary_text rounded-[8px]"
               )}
               onClick={handleStaffClicked}
             >
@@ -69,8 +69,8 @@ const Page = () => {
             </button>
             <button
               className={cn(
-                isStudentClicked ? 'bg-primary-200 ' : 'bg-white',
-                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+                isStudentClicked ? "bg-primary-200 " : "bg-white",
+                "text-center hover:scale-105 active:scale-105 transition-all py-[12px] px-[4px]  border-secondary_text rounded-[8px]"
               )}
               onClick={handleStudentClicked}
             >
@@ -78,15 +78,15 @@ const Page = () => {
             </button>
             <button
               className={cn(
-                isSchoolClicked ? 'bg-primary-200 ' : 'bg-white',
-                'text-center hover:scale-110 active:scale-105 transition-all w-[400px] py-[12px] px-[4px]  border-secondary_text rounded-[8px]'
+                isSchoolClicked ? "bg-primary-200 " : "bg-white",
+                "text-center hover:scale-105 active:scale-105 transition-all py-[12px] px-[4px]  border-secondary_text rounded-[8px]"
               )}
               onClick={handleSchoolClicked}
             >
               School Admin
             </button>
 
-            <div className="mt-[60px]">
+            <div className="mt-[50px]">
               <SignUpButton
                 text="Next Step"
                 background=" bg-[#6695D8]"

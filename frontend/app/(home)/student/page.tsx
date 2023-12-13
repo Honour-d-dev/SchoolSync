@@ -44,7 +44,11 @@ export default function Student() {
           <Image src={logo} alt="logo" className="h-14 w-14" />
           <span className="text-xs -mt-2">SchoolSync</span>
         </div>
-        <ToggleGroup type="single" className="flex flex-col">
+        <ToggleGroup
+          type="single"
+          defaultValue="dashboard"
+          className="flex flex-col"
+        >
           <ToggleGroupItem
             value="dashboard"
             className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"

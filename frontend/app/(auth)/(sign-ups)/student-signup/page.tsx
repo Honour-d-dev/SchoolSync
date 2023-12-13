@@ -1,8 +1,8 @@
-import React from 'react';
-import SignupForm from '@/components/SignupForm';
+import React from "react";
+import SignupForm from "@/components/SignupForm";
 const Page = () => {
   return (
-    <section className=" flex flex-col padding bg-signUp bg-contain min-h-screen">
+    <section className=" flex flex-col padding bg-signUp min-h-screen">
       <div className="flex flex-row self-end">
         <SignupForm
           formTitle="Student Sign Up"
