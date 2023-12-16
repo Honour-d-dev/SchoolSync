@@ -7,6 +7,8 @@ import NextStepBtn from "./NextStepBtn";
 import { useEdgeStore } from "@/lib/edgestore";
 import { handleStudentFormData } from "@/actions/handleFormData";
 import { UploadImageIcon } from "@/public/icons/uploadImageIcon";
+import { useWallet } from "@/context/walletContext";
+import { parseAbi } from "viem";
 
 const SignupForm = ({
   formTitle,
@@ -18,6 +20,8 @@ const SignupForm = ({
   buttonText,
 }: FormProps) => {
   const { edgestore } = useEdgeStore();
+  const { connectWallet, wallet } = useWallet();
+  const [files, setFiles] = useState<{ file: File; infoFile: File }>();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,18 +33,50 @@ const SignupForm = ({
   };
 
   const handleUpload = async (formData: FormData) => {
-    const file = formData.get("image") as File;
-    let url;
-    console.log(file);
+    /**1.connect wallet
+     * 2.confirm that the student isn't already registered
+     * 3.then upload the student files
+     * 4.register on the institution contract
+     */
+    await connectWallet();
 
-    if (file) {
-      const res = await edgestore.publicImages.upload({
-        file,
-      });
-      url = res.url;
-    }
-    await handleStudentFormData(formData, url as string);
+    const file = formData.get("image") as File;
+    const info = {
+      name: formData.get("fullName"),
+      email: formData.get("email"),
+      school: formData.get("school"),
+    };
+
+    const infoFile = new File(
+      [new Blob([JSON.stringify(info)])],
+      formData.get("fullName") as string,
+      { type: "application/json" }
+    );
+    console.log(file);
+    setFiles({ file, infoFile });
   };
+
+  (async () => {
+    if (files && wallet) {
+      const res = await edgestore.publicImages.upload({
+        file: files.file,
+      });
+      const infoRes = await edgestore.publicFiles.upload({
+        file: files.infoFile,
+      });
+
+      const result = await wallet.simulateContract({
+        address: "0x123",
+        abi: parseAbi([
+          "function studentRegistration(uint32,uint32,string,string,string) external payable",
+        ]),
+        functionName: "studentRegistration",
+        args: [123, 2016, "", res.url, infoRes.url],
+      });
+
+      await wallet.writeContract(result.request);
+    }
+  })();
   return (
     <div className=" flex flex-col w-[540px] h-auto rounded-[12px] signUpCard">
       <div className="flex flex-row  items-center  gap-2">
@@ -58,7 +94,7 @@ const SignupForm = ({
         </p>
       </div>
       <form
-        action={(FormData) => {
+        action={async (FormData) => {
           handleUpload(FormData);
         }}
         className="mt-[40px] flex flex-col pl-[70px] gap-[36px]"
