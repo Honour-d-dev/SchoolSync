@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import {
@@ -45,6 +46,7 @@ export default function WalletProvider({ children }: PropsWithChildren) {
 
     const wallet = createWalletClient({
       account,
+      chain,
       transport: custom(window.ethereum),
     }).extend(publicActions);
 
@@ -59,6 +61,11 @@ export default function WalletProvider({ children }: PropsWithChildren) {
 
     setAccount(account);
     setWallet(wallet);
+  }, []);
+
+  useEffect(() => {
+    window.ethereum.on("accountsChanged", connectWallet);
+    window.ethereum.on("chainChanged", connectWallet);
   }, []);
 
   return (

@@ -14,7 +14,7 @@ const NextStepBtn = ({ buttonText }: buttonTextProps) => {
     <button
       type="submit"
       disabled={pending}
-      className="flex flex-col shadow-md items-center w-[358px] bg-primary-200 py-[14px] px-[48px] rounded-[12px] hover:scale-110 active:scale-105 transition-all"
+      className="flex flex-col shadow-md items-center w-full bg-primary-200 py-[14px] px-[48px] rounded-[12px] hover:scale-110 active:scale-105 transition-all"
     >
       {pending ? (
         <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white">

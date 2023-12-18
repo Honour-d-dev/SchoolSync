@@ -7,7 +7,7 @@ pragma solidity ^0.8.17;
  * @notice This contract is still in development
  */
 
-contract Institution {
+contract InstitutionV2 {
   //! Contract events
   //? These events are emitted when certain actions are performed in the contract
   event newStudentRegistration(address indexed _studentAddress, uint id);
@@ -45,8 +45,8 @@ contract Institution {
   mapping(address => bool) public isRegistered;
   mapping(address => bool) public isAdmin;
 
-  constructor(address _ownerAddress, string memory _name, string memory _description) {
-    Owner = _ownerAddress;
+  constructor(string memory _name, string memory _description) {
+    Owner = msg.sender;
     instiutionName = _name;
     description = _description;
   }

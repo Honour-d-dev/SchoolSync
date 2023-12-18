@@ -1,5 +1,5 @@
-import React from 'react';
-import SignupForm from '@/components/SignupForm';
+import React from "react";
+import SignupForm from "@/components/SignupForm";
 const Page = () => {
   return (
     <section className=" flex flex-col padding bg-signUp bg-contain min-h-screen">
@@ -7,10 +7,8 @@ const Page = () => {
         <SignupForm
           formTitle="School Staff Sign Up"
           formDescription="New to Payclick, create an account with few clicks"
-          inputTitle1="Full Name"
-          inputTitle2="Email Address"
-          inputTitle3="School Name"
-          inputTitle4={`Staff I.D Card`}
+          inputTitles={["Full Name", "Email Address", "School Name"]}
+          imageText={`Staff I.D Card`}
           buttonText="Next Step"
         />
       </div>

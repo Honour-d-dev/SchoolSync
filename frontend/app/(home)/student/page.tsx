@@ -13,11 +13,43 @@ import { Profile } from "@/public/icons/profile";
 import { Notification } from "@/public/icons/direct-notification";
 import { Setting } from "@/public/icons/setting";
 import { Message } from "@/public/icons/message";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlignJustify, X } from "lucide-react";
+import { useWallet } from "@/context/walletContext";
+import { institutionV2Abi } from "@/lib/abi";
 
 export default function Student() {
   const [showMenu, setShowMenu] = useState(false);
+  const [studentInfo, setStudentInfo] = useState();
+  const [documents, setDocuments] = useState<readonly string[]>();
+  const { account, wallet, connectWallet } = useWallet();
+
+  useEffect(() => {
+    async function connect() {
+      await connectWallet();
+    }
+    connect();
+  }, []);
+
+  useEffect(() => {
+    async function getInfo() {
+      if (wallet && account) {
+        const studentInfo = await wallet.readContract({
+          address: "0x2E55967fed33582c776CC740CF541bDb774Cb9F2",
+          abi: institutionV2Abi,
+          functionName: "getStudent",
+        });
+        console.log(studentInfo);
+        const res = await fetch(studentInfo.studentInfo);
+        const data = await res.json();
+        setStudentInfo(data);
+        setDocuments(studentInfo.documents);
+        console.log(data, studentInfo.documents);
+      }
+    }
+    getInfo();
+  }, [account, wallet]);
+
   return (
     <div className="bg-white w-screen h-screen flex flex-row">
       <button
@@ -121,6 +153,12 @@ export default function Student() {
       </div>
       {/* content */}
       <div className="flex flex-col justify-center p-6 grow pt-12">
+        <button
+          className="p-2 bg-primary-400 absolute top-4 right-4"
+          onClick={async () => await connectWallet()}
+        >
+          {account ? `${account.slice(0, 6)}...` : "connect"}
+        </button>
         <h1 className="self-start font-semibold text-3xl">
           Welcome to SchoolSync
         </h1>
