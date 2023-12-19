@@ -56,27 +56,6 @@ const SignupForm = ({
     setFiles({ file, infoFile });
   };
 
-  (async () => {
-    if (files && wallet) {
-      const res = await edgestore.publicImages.upload({
-        file: files.file,
-      });
-      const infoRes = await edgestore.publicFiles.upload({
-        file: files.infoFile,
-      });
-
-      const result = await wallet.simulateContract({
-        address: "0x123",
-        abi: parseAbi([
-          "function studentRegistration(uint32,uint32,string,string,string) external payable",
-        ]),
-        functionName: "studentRegistration",
-        args: [123, 2016, "", res.url, infoRes.url],
-      });
-
-      await wallet.writeContract(result.request);
-    }
-  })();
   return (
     <div className=" flex flex-col w-[540px] h-auto rounded-[12px] signUpCard">
       <div className="flex flex-row  items-center  gap-2">

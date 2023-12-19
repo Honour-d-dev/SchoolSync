@@ -32,7 +32,7 @@ const SignUpButton = ({ text, background, fontStyle }: SignUpButtonProps) => {
     <button
       className={`${background} hover:scale-110 active:scale-105 transition-all w-full py-[12px] px-[4px]  border-secondary_text rounded-[8px]`}
       onClick={handleButtonClick}
-      disabled={!isButtonEnabled}
+      disabled={!isButtonEnabled || isSchoolClicked || isStaffClicked} //Temporary, until implementation is done
     >
       <p
         className={`text-[16px] font-OpenSans ${fontStyle} leading-[24px] tracking-[0.16px]`}

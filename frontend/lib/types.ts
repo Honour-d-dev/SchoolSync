@@ -26,3 +26,11 @@ export type validationTypes = {
   email: string;
   school: string;
 };
+
+export type StudentData = {
+  name: string;
+  email: string;
+  school: string;
+  department: string;
+  matricNo: string;
+};

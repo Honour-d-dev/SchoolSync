@@ -5,6 +5,9 @@ import Image from "next/image";
 import SignUpButton from "@/components/SignUpButton";
 import { useActiveSectionContext } from "@/context/active-section-context";
 import { cn } from "@/lib/utils";
+import MetamaskPrompt, {
+  useMetamaskInstalled,
+} from "@/components/MetamaskPrompt";
 
 const Page = () => {
   const {
@@ -16,6 +19,8 @@ const Page = () => {
     setIsStudentClicked,
     setIsButtonEnabled,
   } = useActiveSectionContext();
+
+  const metamaskInstalled = useMetamaskInstalled();
 
   const handleStudentClicked = () => {
     setIsStaffClicked(false);
@@ -39,7 +44,9 @@ const Page = () => {
     setIsSchoolClicked((prevIsSchoolClicked) => !prevIsSchoolClicked);
   };
 
-  return (
+  return !metamaskInstalled ? (
+    <MetamaskPrompt />
+  ) : (
     <section className="flex flex-col padding bg-signUp bg-center h-screen w-screen bg-no-repeat">
       <div className="flex self-end flex-col max-w-[540px] max-h-[645px] w-[80vw] min-w-fit rounded-[12px] signUpCard  ">
         <div className="flex flex-row  items-center  md:gap-2">

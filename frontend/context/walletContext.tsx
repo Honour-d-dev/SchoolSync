@@ -15,7 +15,6 @@ import {
   createWalletClient,
   custom,
   publicActions,
-  toHex,
 } from "viem";
 import { sepolia } from "viem/chains";
 
@@ -40,6 +39,7 @@ export default function WalletProvider({ children }: PropsWithChildren) {
   const [account, setAccount] = useState<Address>();
 
   const connectWallet = useCallback(async () => {
+    if (!window.ethereum) return;
     const [account] = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
@@ -64,8 +64,10 @@ export default function WalletProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    window.ethereum.on("accountsChanged", connectWallet);
-    window.ethereum.on("chainChanged", connectWallet);
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", connectWallet);
+      window.ethereum.on("chainChanged", connectWallet);
+    }
   }, []);
 
   return (

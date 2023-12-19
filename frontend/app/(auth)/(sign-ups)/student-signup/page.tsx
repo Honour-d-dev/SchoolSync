@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useState } from "react";
-import { institutionV2Abi } from "@/lib/abi";
 import { parseEther } from "viem";
 import { useEdgeStore } from "@/lib/edgestore";
 import { useRouter } from "next/navigation";
@@ -8,14 +7,8 @@ import { useWallet } from "@/context/walletContext";
 import { UploadImageIcon } from "@/public/icons/uploadImageIcon";
 import NextStepBtn from "@/components/NextStepBtn";
 import Image from "next/image";
-
-type StudentData = {
-  name: string;
-  email: string;
-  school: string;
-  department: string;
-  matricNo: string;
-};
+import { institutionV2 } from "@/lib/contract";
+import { StudentData } from "@/lib/types";
 
 const Page = () => {
   const { edgestore } = useEdgeStore();
@@ -34,13 +27,8 @@ const Page = () => {
   };
 
   const handleUpload = async (formData: FormData) => {
-    /**1.connect wallet
-     * 2.confirm that the student isn't already registered
-     * 3.then upload the student files
-     * 4.register on the institution contract
-     */
-
     const file = formData.get("image") as File;
+
     const data: StudentData = {
       name: formData.get("fullName") as string,
       email: formData.get("email") as string,
@@ -48,7 +36,6 @@ const Page = () => {
       department: formData.get("department") as string,
       matricNo: formData.get("matric") as string,
     };
-    console.log(file);
 
     await connectWallet();
     setFiles({ file, data });
@@ -60,8 +47,7 @@ const Page = () => {
     registering.current = true;
 
     const isRegistered = await wallet.readContract({
-      address: "0x2E55967fed33582c776CC740CF541bDb774Cb9F2",
-      abi: institutionV2Abi,
+      ...institutionV2,
       functionName: "isRegistered",
       args: [account!],
     });
@@ -82,8 +68,7 @@ const Page = () => {
 
       try {
         const result = await wallet.simulateContract({
-          address: "0x2E55967fed33582c776CC740CF541bDb774Cb9F2",
-          abi: institutionV2Abi,
+          ...institutionV2,
           functionName: "studentRegistration",
           args: [
             BigInt(files.data.matricNo),
