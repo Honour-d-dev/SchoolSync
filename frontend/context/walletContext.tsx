@@ -9,8 +9,6 @@ import {
 } from "react";
 import {
   Address,
-  PublicActions,
-  WalletClient,
   EIP1193Provider,
   createWalletClient,
   custom,
@@ -26,41 +24,49 @@ declare global {
 
 export const chain = sepolia;
 
+//hoisted for type inference
+const getWallet = async () => {
+  const [account] = await window.ethereum.request({
+    method: "eth_requestAccounts",
+  });
+
+  const wallet = createWalletClient({
+    account,
+    chain,
+    transport: custom(window.ethereum),
+  }).extend(publicActions);
+  return wallet;
+};
+
 type TWalletContext = {
-  connectWallet: () => Promise<void>;
-  wallet?: WalletClient & PublicActions;
+  connectWallet: () => Promise<
+    Awaited<ReturnType<typeof getWallet>> | undefined
+  >;
+  wallet?: Awaited<ReturnType<typeof getWallet>>;
   account?: Address;
 };
 
 const WalletContext = createContext<TWalletContext>({} as TWalletContext);
 
 export default function WalletProvider({ children }: PropsWithChildren) {
-  const [wallet, setWallet] = useState<WalletClient & PublicActions>();
+  const [wallet, setWallet] = useState<Awaited<ReturnType<typeof getWallet>>>();
   const [account, setAccount] = useState<Address>();
 
   const connectWallet = useCallback(async () => {
     if (!window.ethereum) return;
-    const [account] = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
 
-    const wallet = createWalletClient({
-      account,
-      chain,
-      transport: custom(window.ethereum),
-    }).extend(publicActions);
+    const wallet = await getWallet();
 
     const chainId = await wallet.getChainId();
     if (chainId !== chain.id) {
-      try {
-        await wallet.switchChain({ id: chain.id });
-      } catch {
-        await wallet.addChain({ chain });
-      }
+      await wallet
+        .switchChain({ id: chain.id })
+        .catch(() => wallet.addChain({ chain }));
     }
 
     setAccount(account);
     setWallet(wallet);
+    return wallet;
   }, []);
 
   useEffect(() => {

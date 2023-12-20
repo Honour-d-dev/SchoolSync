@@ -7,8 +7,10 @@ const Page = () => {
         <SignupForm
           formTitle="School Staff Sign Up"
           formDescription="New to Payclick, create an account with few clicks"
-          inputTitles={["Full Name", "Email Address", "School Name"]}
-          imageText={`Staff I.D Card`}
+          inputTitle1="Full Name"
+          inputTitle2="School Name"
+          inputTitle3="School Name"
+          inputTitle4={`Staff I.D Card`}
           buttonText="Next Step"
         />
       </div>

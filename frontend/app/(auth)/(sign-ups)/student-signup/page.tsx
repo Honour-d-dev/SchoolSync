@@ -12,10 +12,8 @@ import { StudentData } from "@/lib/types";
 
 const Page = () => {
   const { edgestore } = useEdgeStore();
-  const { connectWallet, wallet, account } = useWallet();
-  const [files, setFiles] = useState<{ file: File; data: StudentData }>();
+  const { connectWallet } = useWallet();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const registering = useRef(false);
   const router = useRouter();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,9 +24,12 @@ const Page = () => {
     }
   };
 
-  const handleUpload = async (formData: FormData) => {
-    const file = formData.get("image") as File;
+  const handleRegistration = async (formData: FormData) => {
+    const wallet = await connectWallet();
 
+    if (!wallet) return; //ideally, shoud display an error to the user
+
+    const file = formData.get("image") as File;
     const data: StudentData = {
       name: formData.get("fullName") as string,
       email: formData.get("email") as string,
@@ -37,30 +38,19 @@ const Page = () => {
       matricNo: formData.get("matric") as string,
     };
 
-    await connectWallet();
-    setFiles({ file, data });
-  };
-
-  const register = async () => {
-    if (!files || !wallet || registering.current) return;
-
-    registering.current = true;
-
     const isRegistered = await wallet.readContract({
       ...institutionV2,
       functionName: "isRegistered",
-      args: [account!],
+      args: [wallet.account.address],
     });
 
     if (!isRegistered) {
-      const dataFile = new File(
-        [new Blob([JSON.stringify(files!.data)])],
-        files!.data.name,
-        { type: "application/json" }
-      );
+      const dataFile = new File([new Blob([JSON.stringify(data)])], data.name, {
+        type: "application/json",
+      });
 
       const docRes = await edgestore.publicImages.upload({
-        file: files.file,
+        file: file,
       });
       const dataRes = await edgestore.publicFiles.upload({
         file: dataFile,
@@ -71,9 +61,9 @@ const Page = () => {
           ...institutionV2,
           functionName: "studentRegistration",
           args: [
-            BigInt(files.data.matricNo),
-            BigInt(files.data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
-            files.data.department,
+            BigInt(data.matricNo),
+            BigInt(data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
+            data.department,
             dataRes.url,
             docRes.url,
           ],
@@ -92,12 +82,28 @@ const Page = () => {
     router.push("/student");
   };
 
-  if (files && wallet) register();
+  const loginExistingUser = async () => {
+    const wallet = await connectWallet();
+
+    if (!wallet) return; //ideally, should error here
+
+    const isRegistered = await wallet.readContract({
+      ...institutionV2,
+      functionName: "isRegistered",
+      args: [wallet.account.address],
+    });
+
+    if (isRegistered) {
+      router.push("/student");
+    } else {
+      //user doesnt exist error
+    }
+  };
 
   return (
     <section className=" flex flex-col padding bg-signUp min-h-screen">
       <div className="flex flex-row self-center md:self-end">
-        <div className=" flex flex-col w-[90vw] sm:w-[80vw] p-4 md:w-[540px] h-auto rounded-[12px] signUpCard">
+        <div className=" flex flex-col w-[90vw] sm:w-[80vw] p-4 md:pr-8 md:w-[540px] h-auto rounded-[12px] signUpCard">
           <div className="flex flex-row  items-center  md:gap-2 -ml-6 sm:ml-0">
             <Image src="/icons/logo.png" alt="logo" width={100} height={100} />
             <h1 className="text-[32px] font-Tomorrow font-semibold leading-[32px] tracking-[0.32px] text-[#1C364D] -ml-2 sm:ml-0">
@@ -114,11 +120,11 @@ const Page = () => {
           </div>
           <form
             action={async (FormData) => {
-              handleUpload(FormData);
+              handleRegistration(FormData);
             }}
-            className="mt-[40px] flex flex-col pl-[30px] md:pl-[70px] gap-4 md:gap-7"
+            className="mt-[40px] flex flex-col pl-[30px] md:pl-[70px] gap-4 md:gap-6"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 Full Name
               </p>
@@ -126,10 +132,10 @@ const Page = () => {
                 type="text"
                 name="fullName"
                 required
-                className=" flex h-[48px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
+                className=" flex h-[40px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 Email Address
               </p>
@@ -137,10 +143,10 @@ const Page = () => {
                 type="text"
                 name="email"
                 required
-                className=" flex h-[48px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
+                className=" flex h-[40px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 School
               </p>
@@ -148,10 +154,10 @@ const Page = () => {
                 type="text"
                 name="school"
                 required
-                className=" flex h-[48px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
+                className=" flex h-[40px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 Department
               </p>
@@ -159,10 +165,10 @@ const Page = () => {
                 type="text"
                 name="department"
                 required
-                className=" flex h-[48px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
+                className=" flex h-[40px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 Matric No.
               </p>
@@ -170,7 +176,7 @@ const Page = () => {
                 type="text"
                 name="matric"
                 required
-                className=" flex h-[48px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
+                className=" flex h-[40px] border border-secondary_text rounded-[8px] outline-none font-OpenSans bg-transparent pl-3 text-[12px]"
               />
             </div>
 
@@ -178,40 +184,50 @@ const Page = () => {
               <p className=" font-OpenSans text-[14px] font-bold leading-[20px] tracking-[0.28px]">
                 Student's I.D Card
               </p>
-              <div className="flex flex-col items-center gap-3 border h-auto py-15  border-secondary_text border-dashed rounded-[20px]">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="max-h-[100px] mt-7"
+              <label htmlFor="imageButton">
+                <div className="flex flex-col items-center gap-2 border h-auto py-15  border-secondary_text border-dashed rounded-[20px]">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="max-h-[100px] mt-5"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="mt-5 text-[14px] font-OpenSans font-semibold leading-[20px] tracking-[0.28px]">
+                        Upload Image
+                      </span>
+                      <UploadImageIcon />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    name="image"
+                    accept=".png, .jpg, .jpeg, .svg"
+                    id="imageButton"
+                    placeholder="Upload image"
+                    required
+                    onChange={handleImageChange}
+                    className="w-[1px] opacity-0"
                   />
-                ) : (
-                  <p className="mt-9 text-[14px] font-OpenSans font-semibold leading-[20px] tracking-[0.28px]">
-                    Upload Image
-                  </p>
-                )}
-                <label htmlFor="imageButton">
-                  <UploadImageIcon />
-                </label>
-                <input
-                  type="file"
-                  name="image"
-                  accept=".png, .jpg, .jpeg, .svg"
-                  id="imageButton"
-                  placeholder="Upload image"
-                  required
-                  onChange={handleImageChange}
-                  className="w-[1px] opacity-0"
-                />
-              </div>
+                </div>
+              </label>
             </div>
 
             <NextStepBtn buttonText="Next Step" />
           </form>
+          <span className="text-xs text-center pt-1 font-medium">
+            Registration incurs a min. 0.001 ethers fee
+          </span>
           <p className=" mt-2 self-center font-sans text-[14px] font-medium">
             {" "}
             Already have an account? Proceed to{" "}
-            <span className="text-white">Connect Wallet</span>
+            <button
+              className="text-white hover:underline"
+              onClick={async () => await loginExistingUser()}
+            >
+              Connect Wallet
+            </button>
           </p>
         </div>
       </div>

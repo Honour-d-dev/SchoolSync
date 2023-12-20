@@ -12,39 +12,31 @@ import { SideMenu } from "@/components/SideMenu";
 import { Header } from "@/components/HomePage-Header";
 
 export default function Student() {
-  const metamaskInstalled = useMetamaskInstalled();
-
   const [activeTab, setActiveTab] = useState("dashboard");
   const [studentInfo, setStudentInfo] = useState<StudentData>();
   const [documents, setDocuments] = useState<readonly string[]>();
   const { account, wallet, connectWallet } = useWallet();
+  const isMetamaskInstalled = useMetamaskInstalled();
 
   useEffect(() => {
     async function connect() {
-      await connectWallet();
+      const wallet = await connectWallet();
+      if (!wallet) return;
+      const studentInfo = await wallet.readContract({
+        ...institutionV2,
+        functionName: "getStudent",
+      });
+      console.log(studentInfo);
+      const res = await fetch(studentInfo.studentInfo);
+      const data: StudentData = await res.json();
+      setStudentInfo(data);
+      setDocuments(studentInfo.documents);
+      console.log(data, studentInfo.documents);
     }
     connect();
   }, []);
 
-  useEffect(() => {
-    async function getInfo() {
-      if (wallet && account) {
-        const studentInfo = await wallet.readContract({
-          ...institutionV2,
-          functionName: "getStudent",
-        });
-        console.log(studentInfo);
-        const res = await fetch(studentInfo.studentInfo);
-        const data: StudentData = await res.json();
-        setStudentInfo(data);
-        setDocuments(studentInfo.documents);
-        console.log(data, studentInfo.documents);
-      }
-    }
-    getInfo();
-  }, [account, wallet]);
-
-  if (!metamaskInstalled) return <MetamaskPrompt />;
+  if (!isMetamaskInstalled) return <MetamaskPrompt />;
   return (
     <div className="bg-white w-screen h-screen flex flex-row">
       <SideMenu value={activeTab} setValue={setActiveTab} />
