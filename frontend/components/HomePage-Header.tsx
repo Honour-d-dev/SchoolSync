@@ -1,14 +1,10 @@
 import { ChevronsUpDown, Search } from "lucide-react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { useWallet } from "@/context/walletContext";
 
-export const Header = ({
-  name,
-  account,
-}: {
-  name?: string;
-  account?: string;
-}) => {
+export const Header = ({ name }: { name?: string }) => {
+  const { account } = useWallet();
   return (
     <div className="grid grid-cols-5">
       <div className="rounded-lg border border-primary-300 flex flex-row px-2 py-1 font-Inconsolata self-center col-span-3 col-start-1 overflow-hidden md:col-span-2 md:col-start-2">

@@ -64,7 +64,7 @@ export default function WalletProvider({ children }: PropsWithChildren) {
         .catch(() => wallet.addChain({ chain }));
     }
 
-    setAccount(account);
+    setAccount(wallet.account.address);
     setWallet(wallet);
     return wallet;
   }, []);
