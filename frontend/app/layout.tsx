@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import ActiveSectionContextProvider from "@/context/active-section-context";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 import WalletProvider from "@/context/walletContext";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "School Sync",
@@ -24,6 +25,7 @@ export default function RootLayout({
             </ActiveSectionContextProvider>
           </WalletProvider>
         </EdgeStoreProvider>
+        <Toaster />
       </body>
     </html>
   );

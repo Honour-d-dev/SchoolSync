@@ -9,11 +9,14 @@ import NextStepBtn from "@/components/NextStepBtn";
 import Image from "next/image";
 import { institutionV2 } from "@/lib/contract";
 import { StudentData } from "@/lib/types";
+import { useToast } from "@/components/ui/use-toast";
 
 const Page = () => {
   const { edgestore } = useEdgeStore();
   const { connectWallet } = useWallet();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const { toast } = useToast();
   const router = useRouter();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,9 +28,17 @@ const Page = () => {
   };
 
   const handleRegistration = async (formData: FormData) => {
+    setPending(true);
     const wallet = await connectWallet();
 
-    if (!wallet) return; //ideally, shoud display an error to the user
+    if (!wallet) {
+      toast({
+        title: "Wallet Error",
+        description: "Wallet Connection failed",
+      });
+      setPending(false);
+      return;
+    }
 
     const file = formData.get("image") as File;
     const data: StudentData = {
@@ -72,20 +83,40 @@ const Page = () => {
 
         const hash = await wallet.writeContract(result.request);
         await wallet.waitForTransactionReceipt({ hash });
-      } catch {
+      } catch (e) {
         /**transaction failed */
-        console.log("failed");
+        let message = "";
+        if (e instanceof Error) message = e.message;
+        toast({
+          title: "Registration Failed",
+          description: `Student registration failed: ${message}`,
+        });
+        setPending(false);
+        return;
       }
+      setPending(false);
+      router.push("/student");
     } else {
-      /**Error user exists */
+      toast({
+        title: "Account Error",
+        description: "Student already exists",
+      });
+      setPending(false);
     }
-    router.push("/student");
   };
 
   const loginExistingUser = async () => {
+    setPending(true);
     const wallet = await connectWallet();
 
-    if (!wallet) return; //ideally, should error here
+    if (!wallet) {
+      toast({
+        title: "Wallet Error",
+        description: "Wallet Connection failed",
+      });
+      setPending(false);
+      return;
+    }
 
     const isRegistered = await wallet.readContract({
       ...institutionV2,
@@ -94,9 +125,14 @@ const Page = () => {
     });
 
     if (isRegistered) {
+      setPending(false);
       router.push("/student");
     } else {
-      //user doesnt exist error
+      toast({
+        title: "Account Error",
+        description: "Student account does not exist",
+      });
+      setPending(false);
     }
   };
 
@@ -214,10 +250,10 @@ const Page = () => {
               </label>
             </div>
 
-            <NextStepBtn buttonText="Next Step" />
+            <NextStepBtn buttonText="Next Step" pending={pending} />
           </form>
           <span className="text-xs text-center pt-1 font-medium">
-            Registration incurs a min. 0.001 ethers fee
+            Registration incurs a min. 0.001 ether fee
           </span>
           <p className=" mt-2 self-center font-sans text-[14px] font-medium">
             {" "}
