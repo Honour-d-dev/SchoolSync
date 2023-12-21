@@ -1,138 +1,254 @@
 "use client";
-import logo from "@/public/icons/logo.png";
 import Image from "next/image";
 import fileImg from "@/public/icons/notes composition.png";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Separator } from "@/components/ui/seperator";
-import { Home } from "@/public/icons/home";
-import { Activity } from "@/public/icons/activity";
-import { Book } from "@/public/icons/book";
-import { Records } from "@/public/icons/records";
-import { AdminIcon } from "@/public/icons/admin";
-import { Profile } from "@/public/icons/profile";
-import { Notification } from "@/public/icons/direct-notification";
-import { Setting } from "@/public/icons/setting";
-import { Message } from "@/public/icons/message";
-import { useState } from "react";
-import { AlignJustify, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useWallet } from "@/context/walletContext";
+import { institutionV2 } from "@/lib/contract";
+import { StudentData } from "@/lib/types";
+import MetamaskPrompt, {
+  useMetamaskInstalled,
+} from "@/components/MetamaskPrompt";
+import { SideMenu } from "@/components/SideMenu";
+import { Header } from "@/components/HomePage-Header";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 export default function Student() {
-  const [showMenu, setShowMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [studentInfo, setStudentInfo] = useState<StudentData>();
+  const [documents, setDocuments] = useState<readonly string[]>();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { account, wallet, connectWallet } = useWallet();
+  const isMetamaskInstalled = useMetamaskInstalled();
+
+  useEffect(() => {
+    async function connect() {
+      const wallet = await connectWallet();
+      if (!wallet) return;
+      const studentInfo = await wallet.readContract({
+        ...institutionV2,
+        functionName: "getStudent",
+      });
+      console.log(studentInfo);
+      const res = await fetch(studentInfo.studentInfo);
+      const data: StudentData = await res.json();
+      setStudentInfo(data);
+      setDocuments(studentInfo.documents);
+      console.log(data, studentInfo.documents);
+    }
+    connect();
+  }, []);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImagePreview(imageUrl);
+    }
+  };
+
+  if (!isMetamaskInstalled) return <MetamaskPrompt />;
   return (
     <div className="bg-white w-screen h-screen flex flex-row">
-      <button
-        className={`md:hidden ${
-          showMenu ? "hidden" : ""
-        } absolute top-4 left-4`}
-        onClick={() => setShowMenu((p) => !p)}
-      >
-        <AlignJustify />
-      </button>
-      {/* side menu */}
-      <div
-        className={`rounded-r-3xl h-screen min-w-[210px] w-1/5 bg-primary-400 items-center md:flex flex-col pt-12 p-2 gap-4 relative ${
-          !showMenu ? "hidden" : "flex"
-        }`}
-      >
-        <button
-          className="md:hidden absolute top-4 right-4"
-          onClick={() => setShowMenu((p) => !p)}
-        >
-          <X />
-        </button>
-        <div className="bg-white rounded flex flex-col justify-center items-center p-1 w-fit">
-          <Image src={logo} alt="logo" className="h-14 w-14" />
-          <span className="text-xs -mt-2">SchoolSync</span>
-        </div>
-        <ToggleGroup type="single" className="flex flex-col">
-          <ToggleGroupItem
-            value="dashboard"
-            className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
-          >
-            <Home />
-            <span className="text-white font-Inconsolata ml-4"> Dashboard</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="activity"
-            className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
-          >
-            <Activity />
-            <span className="text-white font-Inconsolata ml-4"> Activity</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="academics"
-            className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
-          >
-            <Book />
-            <span className="text-white font-Inconsolata ml-4"> Academics</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="student records"
-            className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
-          >
-            <Records />
-            <span className="text-white font-Inconsolata ml-4">
-              Student Records
-            </span>
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="admin"
-            className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
-          >
-            <AdminIcon />
-            <span className="text-white font-Inconsolata ml-4">Admin</span>
-          </ToggleGroupItem>
-
-          <Separator className="bg-accent-400 my-8" />
-
-          <ToggleGroupItem
-            value="profile"
-            className="text-white data-[state=on]:text-primary-400 data-[state=on]:bg-white font-Inconsolata gap-4 w-full justify-start"
-          >
-            <Profile />
-            Profile
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="notification"
-            className="text-white data-[state=on]:text-primary-400 data-[state=on]:bg-white font-Inconsolata gap-4 w-full justify-start"
-          >
-            <Notification />
-            Notification
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="settings"
-            className="text-white data-[state=on]:text-primary-400 data-[state=on]:bg-white font-Inconsolata gap-4 w-full justify-start"
-          >
-            <Setting />
-            Settings
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="help"
-            className="text-white data-[state=on]:text-primary-400 data-[state=on]:bg-white font-Inconsolata gap-4 w-full justify-start"
-          >
-            <Message />
-            Help & Support
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-      {/* content */}
-      <div className="flex flex-col justify-center p-6 grow pt-12">
-        <h1 className="self-start font-semibold text-3xl">
-          Welcome to SchoolSync
-        </h1>
-        <div className="h-full w-full flex justify-center items-center flex-col">
-          <div className="flex flex-col items-center">
-            <Image
-              src={fileImg}
-              alt="no files"
-              className="h-[350px] w-[350px]"
-            />
-            <span>No records yet</span>
+      <SideMenu value={activeTab} setValue={setActiveTab} />
+      <div className="flex flex-col justify-start p-6 grow">
+        <Header name={studentInfo?.name} />
+        {/* content */}
+        {activeTab === "student records" ? (
+          <div className="grid p-6 gap-2 grid-cols-3">
+            {documents?.map((doc) => {
+              return (
+                <Image
+                  src={doc}
+                  alt="document"
+                  key={doc}
+                  width={500}
+                  height={700}
+                  className="rounded p-2 w-full border border-gray-300"
+                />
+              );
+            })}
           </div>
-          <span className="mt-8">
-            Go to Profile to fill in your required information
-          </span>
-        </div>
+        ) : null}
+        {activeTab === "dashboard" ? (
+          <div className="flex flex-col w-full h-full">
+            <h1 className="self-start font-semibold text-3xl">
+              Welcome to SchoolSync
+            </h1>
+            <div className="h-full w-full flex justify-center items-center flex-col">
+              <div className="flex flex-col items-center">
+                <Image
+                  src={fileImg}
+                  alt="no files"
+                  className="h-[350px] w-[350px]"
+                />
+                <span>No records yet</span>
+              </div>
+              <span className="mt-8">
+                Go to Profile to fill in your required information
+              </span>
+            </div>
+          </div>
+        ) : null}
+        {activeTab === "profile" ? (
+          <div className="h-full">
+            <form action="" className="flex flex-col gap-8 h-full pb-10">
+              <div>
+                <Avatar className="h-[120px] w-[120px]">
+                  <AvatarImage
+                    src={imagePreview ?? "/images/defaultProfile.png"}
+                    className=""
+                  />
+                </Avatar>
+                <span className="text-sm">
+                  Upload Photo{" "}
+                  <label
+                    className="text-xs rounded-md bg-accent-300 px-1 opacity-80"
+                    htmlFor="uploadImage"
+                  >
+                    choose media
+                  </label>
+                  <input
+                    type="file"
+                    id="uploadImage"
+                    className="invisible w-0"
+                    accept=".png, .jpg, .jpeg, .svg"
+                    onChange={handleImageChange}
+                  />
+                </span>
+              </div>
+              <div className=" flex flex-col justify-evenly md:grid md:grid-cols-2 gap-2 md:gap-x-8 font-Inconsolata grow">
+                <div className="flex flex-row justify-between items-center order-1">
+                  <label className="w-[165px]" htmlFor="">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue={studentInfo?.name.split(" ")[0] ?? ""}
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-4 md:order-2">
+                  <label className="w-[165px]" htmlFor="">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-2 md:order-3">
+                  <label className="w-[165px]" htmlFor="">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue={studentInfo?.name.split(" ")[1] ?? ""}
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-5 md:order-4">
+                  <label className="w-[165px]" htmlFor="">
+                    Email Address
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue={studentInfo?.email ?? ""}
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-3 md:order-5">
+                  <label className="w-[165px]" htmlFor="">
+                    Middle Name
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-11 md:order-6">
+                  <label className="w-[165px]" htmlFor="">
+                    Country of Residence
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-6 md:order-7">
+                  <label className="w-[165px]" htmlFor="">
+                    Gender
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center row-span-2 order-12 md:order-8">
+                  <label className="w-[165px]" htmlFor="">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-7 md:order-9">
+                  <label className="w-[165px]" htmlFor="">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-8 md:order-10">
+                  <label className="w-[165px]" htmlFor="">
+                    Father's Name
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-10 md:order-11">
+                  <label className="w-[165px]" htmlFor="">
+                    Nationality
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-9 md:order-12">
+                  <label className="w-[165px]" htmlFor="">
+                    Mother's Name
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+                <div className="flex flex-row justify-between items-center order-[13]">
+                  <label className="w-[165px]" htmlFor="">
+                    postal address
+                  </label>
+                  <input
+                    type="text"
+                    className="rounded-lg focus-visible:outline-none border border-gray-400 h-full flex grow pl-4"
+                  />
+                </div>
+              </div>
+              <div className="flex w-full flex-row justify-end">
+                <button
+                  disabled
+                  className="rounded-[12px] shadow-md shadow-black bg-accent-300 p-2 px-8"
+                >
+                  save
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : null}
       </div>
     </div>
   );
