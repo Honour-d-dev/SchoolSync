@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { parseEther } from "viem";
 import { useEdgeStore } from "@/lib/edgestore";
 import { useRouter } from "next/navigation";
@@ -10,37 +10,19 @@ import Image from "next/image";
 import { institutionV2 } from "@/lib/contract";
 import { StudentData } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
+import { useImagePreview } from "@/lib/utils";
 
 const Page = () => {
   const { edgestore } = useEdgeStore();
   const { connectWallet } = useWallet();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [imagePreview, handleImageChange] = useImagePreview();
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-    }
-  };
-
-  const handleRegistration = async (formData: FormData) => {
-    setPending(true);
-    const wallet = await connectWallet();
-
-    if (!wallet) {
-      toast({
-        title: "Wallet Error",
-        description: "Wallet Connection failed",
-      });
-      setPending(false);
-      return;
-    }
-
+  const handleUpload = async (formData: FormData) => {
     const file = formData.get("image") as File;
+
     const data: StudentData = {
       name: formData.get("fullName") as string,
       email: formData.get("email") as string,
@@ -49,88 +31,123 @@ const Page = () => {
       matricNo: formData.get("matric") as string,
     };
 
-    const isRegistered = await wallet.readContract({
-      ...institutionV2,
-      functionName: "isRegistered",
-      args: [wallet.account.address],
+    const dataFile = new File([new Blob([JSON.stringify(data)])], data.name, {
+      type: "application/json",
     });
 
-    if (!isRegistered) {
-      const dataFile = new File([new Blob([JSON.stringify(data)])], data.name, {
-        type: "application/json",
+    const docRes = await edgestore.publicImages.upload({
+      file: file,
+    });
+    const dataRes = await edgestore.publicFiles.upload({
+      file: dataFile,
+    });
+
+    return { data, docRes, dataRes };
+  };
+
+  const handleRegistration = async (formData: FormData) => {
+    try {
+      setPending(true);
+      const wallet = await connectWallet();
+
+      const isRegistered = await wallet.readContract({
+        ...institutionV2,
+        functionName: "isRegistered",
+        args: [wallet.account.address],
       });
 
-      const docRes = await edgestore.publicImages.upload({
-        file: file,
-      });
-      const dataRes = await edgestore.publicFiles.upload({
-        file: dataFile,
-      });
+      if (!isRegistered) {
+        const { data, docRes, dataRes } = await handleUpload(formData);
 
-      try {
-        const result = await wallet.simulateContract({
-          ...institutionV2,
-          functionName: "studentRegistration",
-          args: [
-            BigInt(data.matricNo),
-            BigInt(data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
-            data.department,
-            dataRes.url,
-            docRes.url,
-          ],
-          value: parseEther("0.001"),
-        });
+        try {
+          const result = await wallet.simulateContract({
+            ...institutionV2,
+            functionName: "studentRegistration",
+            args: [
+              BigInt(data.matricNo),
+              BigInt(data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
+              data.department,
+              dataRes.url,
+              docRes.url,
+            ],
+            value: parseEther("0.001"),
+          });
 
-        const hash = await wallet.writeContract(result.request);
-        await wallet.waitForTransactionReceipt({ hash });
-      } catch (e) {
-        /**transaction failed */
-        let message = "";
-        if (e instanceof Error) message = e.message;
-        toast({
-          title: "Registration Failed",
-          description: `Student registration failed: ${message}`,
-        });
+          const hash = await wallet.writeContract(result.request);
+          await wallet.waitForTransactionReceipt({ hash });
+        } catch (e) {
+          /**transaction failed */
+          let message = "";
+          if (e instanceof Error) message = e.message;
+          toast({
+            title: "Registration Failed",
+            description: `Student registration failed: ${message}`,
+          });
+          setPending(false);
+          return;
+        }
         setPending(false);
-        return;
+
+        router.push("/student");
+      } else {
+        toast({
+          title: "Account Error",
+          description: "Student already exists",
+        });
+
+        setPending(false);
       }
-      setPending(false);
-      router.push("/student");
-    } else {
+    } catch (e) {
+      let title = "Registration Error";
+      let message = "";
+
+      /**Some Errors i.e Metamask erors are not Error instances */
+      if (e && typeof e === "object") {
+        if ("message" in e) message = e.message as string;
+        if ("name" in e) title = e.name as string;
+      }
+
       toast({
-        title: "Account Error",
-        description: "Student already exists",
+        title,
+        description: `Registration failed: ${message}`,
       });
       setPending(false);
     }
   };
 
   const loginExistingUser = async () => {
-    setPending(true);
-    const wallet = await connectWallet();
+    try {
+      setPending(true);
+      const wallet = await connectWallet();
 
-    if (!wallet) {
-      toast({
-        title: "Wallet Error",
-        description: "Wallet Connection failed",
+      const isRegistered = await wallet.readContract({
+        ...institutionV2,
+        functionName: "isRegistered",
+        args: [wallet.account.address],
       });
-      setPending(false);
-      return;
-    }
 
-    const isRegistered = await wallet.readContract({
-      ...institutionV2,
-      functionName: "isRegistered",
-      args: [wallet.account.address],
-    });
+      if (isRegistered) {
+        setPending(false);
+        router.push("/student");
+      } else {
+        toast({
+          title: "Account Error",
+          description: "Student account does not exist",
+        });
+        setPending(false);
+      }
+    } catch (e) {
+      let title = "Account Error";
+      let message = "";
 
-    if (isRegistered) {
-      setPending(false);
-      router.push("/student");
-    } else {
+      if (e && typeof e === "object") {
+        if ("message" in e) message = e.message as string;
+        if ("name" in e) title = e.name as string;
+      }
+
       toast({
-        title: "Account Error",
-        description: "Student account does not exist",
+        title,
+        description: `${message}`,
       });
       setPending(false);
     }

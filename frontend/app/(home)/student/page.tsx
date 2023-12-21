@@ -11,40 +11,61 @@ import MetamaskPrompt, {
 import { SideMenu } from "@/components/SideMenu";
 import { Header } from "@/components/HomePage-Header";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useImagePreview } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function Student() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [studentInfo, setStudentInfo] = useState<StudentData>();
   const [documents, setDocuments] = useState<readonly string[]>();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, handleImageChange] = useImagePreview();
   const { account, wallet, connectWallet } = useWallet();
+  const { toast } = useToast();
+  const router = useRouter();
   const isMetamaskInstalled = useMetamaskInstalled();
 
   useEffect(() => {
     async function connect() {
-      const wallet = await connectWallet();
-      if (!wallet) return;
-      const studentInfo = await wallet.readContract({
-        ...institutionV2,
-        functionName: "getStudent",
-      });
-      console.log(studentInfo);
-      const res = await fetch(studentInfo.studentInfo);
-      const data: StudentData = await res.json();
-      setStudentInfo(data);
-      setDocuments(studentInfo.documents);
-      console.log(data, studentInfo.documents);
+      try {
+        const wallet = await connectWallet();
+
+        const isRegistered = await wallet.readContract({
+          ...institutionV2,
+          functionName: "isRegistered",
+          args: [wallet.account.address],
+        });
+
+        if (isRegistered) {
+          const studentInfo = await wallet.readContract({
+            ...institutionV2,
+            functionName: "getStudent",
+          });
+
+          const res = await fetch(studentInfo.studentInfo);
+          const data: StudentData = await res.json();
+          setStudentInfo(data);
+          setDocuments(studentInfo.documents);
+        } else {
+          router.push("/get-started");
+        }
+      } catch (e) {
+        let title = "Account Error";
+        let message = "";
+        /**Some Errors i.e Metamask erors are not Error instances */
+        if (e && typeof e === "object") {
+          if ("message" in e) message = e.message as string;
+          if ("name" in e) title = e.name as string;
+        }
+
+        toast({
+          title,
+          description: `Registration failed: ${message}`,
+        });
+      }
     }
     connect();
   }, []);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-    }
-  };
 
   if (!isMetamaskInstalled) return <MetamaskPrompt />;
   return (
