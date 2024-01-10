@@ -14,6 +14,8 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useImagePreview } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getDownloadUrl } from "@edgestore/react/utils";
 
 export default function Student() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -71,21 +73,26 @@ export default function Student() {
   return (
     <div className="bg-white w-screen h-screen flex flex-row">
       <SideMenu value={activeTab} setValue={setActiveTab} />
-      <div className="flex flex-col justify-start p-6 grow">
+      <div className="flex flex-col justify-start p-6 w-full">
         <Header name={studentInfo?.name} />
         {/* content */}
         {activeTab === "student records" ? (
-          <div className="grid p-6 gap-2 grid-cols-3">
+          <div className="grid p-6 gap-2 grid-cols-4 w-full">
             {documents?.map((doc) => {
               return (
-                <Image
-                  src={doc}
-                  alt="document"
-                  key={doc}
-                  width={500}
-                  height={700}
-                  className="rounded p-2 w-full border border-gray-300"
-                />
+                <>
+                  <Image
+                    src={doc}
+                    alt="document"
+                    key={doc}
+                    width={500}
+                    height={700}
+                    className="rounded p-2 w-full border border-gray-300"
+                  />
+                  <a href={getDownloadUrl(doc)} download="document">
+                    download
+                  </a>
+                </>
               );
             })}
           </div>
