@@ -17,7 +17,7 @@ const Page = () => {
   const { connectWallet } = useWallet();
   const [pending, setPending] = useState(false);
   const [imagePreview, handleImageChange] = useImagePreview();
-  const { toast } = useToast();
+  const { toast, toastWithError } = useToast();
   const router = useRouter();
 
   const handleUpload = async (formData: FormData) => {
@@ -75,13 +75,12 @@ const Page = () => {
 
           const hash = await wallet.writeContract(result.request);
           await wallet.waitForTransactionReceipt({ hash });
-        } catch (e) {
+        } catch (error) {
           /**transaction failed */
-          let message = "";
-          if (e instanceof Error) message = e.message;
-          toast({
+          toastWithError({
             title: "Registration Failed",
-            description: `Student registration failed: ${message}`,
+            description: `Student registration failed`,
+            error,
           });
           setPending(false);
           return;
@@ -97,20 +96,8 @@ const Page = () => {
 
         setPending(false);
       }
-    } catch (e) {
-      let title = "Registration Error";
-      let message = "";
-
-      /**Some Errors i.e Metamask erors are not Error instances */
-      if (e && typeof e === "object") {
-        if ("message" in e) message = e.message as string;
-        if ("name" in e) title = e.name as string;
-      }
-
-      toast({
-        title,
-        description: `Registration failed: ${message}`,
-      });
+    } catch (error) {
+      toastWithError({ title: "Registration Error", error });
       setPending(false);
     }
   };
@@ -136,18 +123,10 @@ const Page = () => {
         });
         setPending(false);
       }
-    } catch (e) {
-      let title = "Account Error";
-      let message = "";
-
-      if (e && typeof e === "object") {
-        if ("message" in e) message = e.message as string;
-        if ("name" in e) title = e.name as string;
-      }
-
-      toast({
-        title,
-        description: `${message}`,
+    } catch (error) {
+      toastWithError({
+        title: "Wallet Error",
+        error,
       });
       setPending(false);
     }

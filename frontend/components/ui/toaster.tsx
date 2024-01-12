@@ -9,6 +9,7 @@ import {
   ToastViewport,
 } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
+import { AlertCircle } from "lucide-react";
 
 export function Toaster() {
   const { toasts } = useToast();
@@ -19,7 +20,18 @@ export function Toaster() {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
+              {title && (
+                <ToastTitle>
+                  {props.variant === "destructive" ? (
+                    <span className="flex flex-row gap-2">
+                      <AlertCircle />
+                      {title}
+                    </span>
+                  ) : (
+                    title
+                  )}
+                </ToastTitle>
+              )}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}

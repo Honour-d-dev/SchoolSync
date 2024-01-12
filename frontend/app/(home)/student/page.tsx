@@ -16,6 +16,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getDownloadUrl } from "@edgestore/react/utils";
+import { Download } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export default function Student() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -23,7 +25,7 @@ export default function Student() {
   const [documents, setDocuments] = useState<readonly string[]>();
   const [imagePreview, handleImageChange] = useImagePreview();
   const { account, wallet, connectWallet } = useWallet();
-  const { toast } = useToast();
+  const { toastWithError } = useToast();
   const router = useRouter();
   const isMetamaskInstalled = useMetamaskInstalled();
 
@@ -51,18 +53,11 @@ export default function Student() {
         } else {
           router.push("/get-started");
         }
-      } catch (e) {
-        let title = "Account Error";
-        let message = "";
-        /**Some Errors i.e Metamask erors are not Error instances */
-        if (e && typeof e === "object") {
-          if ("message" in e) message = e.message as string;
-          if ("name" in e) title = e.name as string;
-        }
-
-        toast({
-          title,
-          description: `Registration failed: ${message}`,
+      } catch (error) {
+        toastWithError({
+          title: "Account Error",
+          description: ``, //todo
+          error,
         });
       }
     }
@@ -77,22 +72,34 @@ export default function Student() {
         <Header name={studentInfo?.name} />
         {/* content */}
         {activeTab === "student records" ? (
-          <div className="grid p-6 gap-2 grid-cols-4 w-full">
+          <div className="grid p-6 gap-2 grid-cols-2 md:grid-cols-4 w-full">
             {documents?.map((doc) => {
               return (
-                <>
-                  <Image
-                    src={doc}
-                    alt="document"
-                    key={doc}
-                    width={500}
-                    height={700}
-                    className="rounded p-2 w-full border border-gray-300"
-                  />
-                  <a href={getDownloadUrl(doc)} download="document">
-                    download
-                  </a>
-                </>
+                <Dialog key={doc}>
+                  <DialogTrigger asChild>
+                    <div className="relative">
+                      <Image
+                        src={doc}
+                        alt="document"
+                        width={500}
+                        height={700}
+                        className="rounded p-2 w-full border border-gray-300"
+                      />
+                      <a
+                        className="absolute bottom-2 right-2 scale-90 hover:scale-110 opacity-80 transition-transform ease-in-out duration-300"
+                        /**prevent from triggering the dialog */
+                        onClick={(e) => e.stopPropagation()}
+                        href={getDownloadUrl(doc, "schoolsync.jpg")}
+                        download
+                      >
+                        <Download />
+                      </a>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="p-4 bg-gray-200">
+                    <Image src={doc} alt="doc" width={500} height={700} />
+                  </DialogContent>
+                </Dialog>
               );
             })}
           </div>

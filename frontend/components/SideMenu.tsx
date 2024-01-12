@@ -24,6 +24,7 @@ export const SideMenu = ({
   const [showMenu, setShowMenu] = useState(false);
   return (
     <>
+      {/*todo use sheets from shadcn*/}
       <button
         className={`md:hidden ${
           showMenu ? "hidden" : ""
@@ -32,7 +33,6 @@ export const SideMenu = ({
       >
         <AlignJustify />
       </button>
-
       <div
         className={`rounded-r-3xl h-screen min-w-[210px] w-1/5 bg-primary-400 items-center flex-col pt-12 p-2 gap-4 absolute top-0 left-0 z-10 md:relative ${
           !showMenu ? "hidden md:flex" : "flex"
@@ -85,13 +85,13 @@ export const SideMenu = ({
               Student Records
             </span>
           </ToggleGroupItem>
-          <ToggleGroupItem
+          {/* <ToggleGroupItem
             value="admin"
             className="text-white data-[state=on]:text-accent-400 data-[state=on]:border-r data-[state=on]:border-accent-400 w-full justify-start"
           >
             <AdminIcon />
             <span className="text-white font-Inconsolata ml-4">Admin</span>
-          </ToggleGroupItem>
+          </ToggleGroupItem> */}
 
           <Separator className="bg-accent-400 my-8" />
 
