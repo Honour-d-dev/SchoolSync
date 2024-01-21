@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity 0.8.19;
 
-import {InstitutionV2, Faculty} from "./institutionV2.sol";
+import {InstitutionV2} from "./institutionV2.sol";
 
 contract SchoolSyncV2 {
   struct InstitutionInfo {
@@ -36,10 +36,9 @@ contract SchoolSyncV2 {
   /**
    * @dev Users with a basic subscription tier can not create more than 2 institution instances
    * @param name this is the name of the instiution
-   * @param faculties Faculty array for the insttitution
    */
-  function createInstitution(string memory name, Faculty[] calldata faculties) external {
-    InstitutionV2 institution = new InstitutionV2(name, faculties);
+  function createInstitution(string calldata name) external {
+    InstitutionV2 institution = new InstitutionV2(name);
     s_Instiutions.push(InstitutionInfo(name, institution));
   }
 

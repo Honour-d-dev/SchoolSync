@@ -33,4 +33,25 @@ export type StudentData = {
   school: string;
   department: string;
   matricNo: string;
+  imageUrl?: string;
+  phone?: string;
+  middleName?: string;
+  sex?: string;
+  nationality?: string;
+  dob?: string;
 };
+
+export type Sessions = readonly {
+  firstSemester: readonly {
+    courseCode: string;
+    courseTitle: string;
+    unit: number;
+    score: number;
+  }[];
+  secondSemester: readonly {
+    courseCode: string;
+    courseTitle: string;
+    unit: number;
+    score: number;
+  }[];
+}[];

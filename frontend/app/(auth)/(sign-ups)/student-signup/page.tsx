@@ -42,7 +42,7 @@ const Page = () => {
       file: dataFile,
     });
 
-    return { data, docRes, dataRes };
+    return { data, docRes, dataRes, fileName: file.name };
   };
 
   const handleRegistration = async (formData: FormData) => {
@@ -53,22 +53,22 @@ const Page = () => {
       const isRegistered = await wallet.readContract({
         ...institutionV2,
         functionName: "isRegistered",
-        args: [wallet.account.address],
       });
 
       if (!isRegistered) {
-        const { data, docRes, dataRes } = await handleUpload(formData);
+        const { data, docRes, dataRes, fileName } = await handleUpload(
+          formData
+        );
 
         try {
           const result = await wallet.simulateContract({
             ...institutionV2,
             functionName: "studentRegistration",
             args: [
-              BigInt(data.matricNo),
-              BigInt(data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
-              data.department,
+              data.matricNo,
+              data.name,
               dataRes.url,
-              docRes.url,
+              { name: fileName, uri: docRes.url },
             ],
             value: parseEther("0.001"),
           });
@@ -110,7 +110,6 @@ const Page = () => {
       const isRegistered = await wallet.readContract({
         ...institutionV2,
         functionName: "isRegistered",
-        args: [wallet.account.address],
       });
 
       if (isRegistered) {
@@ -147,7 +146,7 @@ const Page = () => {
               Student Sign Up
             </h3>
             <p className="text-[12px] font-SpaceGrotesk font-normal leading-[18px] tracking-[0.4px] text-secondary_text">
-              New to Payclick, create an account with few clicks
+              New to SchoolSync, create an account with few clicks
             </p>
           </div>
           <form
