@@ -166,6 +166,33 @@ function toast({ ...props }: Toast) {
   };
 }
 
+type ToastWithError = Omit<Toast, "variant"> & {
+  error?: unknown;
+};
+
+function toastWithError({
+  error,
+  title,
+  description,
+  ...props
+}: ToastWithError) {
+  /**Some Errors i.e Metamask erors are not Error instances */
+  if (error && typeof error === "object") {
+    if ("message" in error)
+      description = description
+        ? `${description}: ${error.message as string}`
+        : (error.message as string);
+    if ("name" in error) title = error.name as string;
+  }
+
+  return toast({
+    title,
+    description,
+    variant: "destructive",
+    ...props,
+  });
+}
+
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
 
@@ -182,6 +209,7 @@ function useToast() {
   return {
     ...state,
     toast,
+    toastWithError,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   };
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { parseEther } from "viem";
 import { useEdgeStore } from "@/lib/edgestore";
 import { useRouter } from "next/navigation";
@@ -10,37 +10,19 @@ import Image from "next/image";
 import { institutionV2 } from "@/lib/contract";
 import { StudentData } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
+import { useImagePreview } from "@/lib/utils";
 
 const Page = () => {
   const { edgestore } = useEdgeStore();
   const { connectWallet } = useWallet();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const { toast } = useToast();
+  const [imagePreview, handleImageChange] = useImagePreview();
+  const { toast, toastWithError } = useToast();
   const router = useRouter();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-    }
-  };
-
-  const handleRegistration = async (formData: FormData) => {
-    setPending(true);
-    const wallet = await connectWallet();
-
-    if (!wallet) {
-      toast({
-        title: "Wallet Error",
-        description: "Wallet Connection failed",
-      });
-      setPending(false);
-      return;
-    }
-
+  const handleUpload = async (formData: FormData) => {
     const file = formData.get("image") as File;
+
     const data: StudentData = {
       name: formData.get("fullName") as string,
       email: formData.get("email") as string,
@@ -49,88 +31,101 @@ const Page = () => {
       matricNo: formData.get("matric") as string,
     };
 
-    const isRegistered = await wallet.readContract({
-      ...institutionV2,
-      functionName: "isRegistered",
-      args: [wallet.account.address],
+    const dataFile = new File([new Blob([JSON.stringify(data)])], data.name, {
+      type: "application/json",
     });
 
-    if (!isRegistered) {
-      const dataFile = new File([new Blob([JSON.stringify(data)])], data.name, {
-        type: "application/json",
+    const docRes = await edgestore.publicImages.upload({
+      file: file,
+    });
+    const dataRes = await edgestore.publicFiles.upload({
+      file: dataFile,
+    });
+
+    return { data, docRes, dataRes, fileName: file.name };
+  };
+
+  const handleRegistration = async (formData: FormData) => {
+    try {
+      setPending(true);
+      const wallet = await connectWallet();
+
+      const isRegistered = await wallet.readContract({
+        ...institutionV2,
+        functionName: "isRegistered",
       });
 
-      const docRes = await edgestore.publicImages.upload({
-        file: file,
-      });
-      const dataRes = await edgestore.publicFiles.upload({
-        file: dataFile,
-      });
+      if (!isRegistered) {
+        const { data, docRes, dataRes, fileName } = await handleUpload(
+          formData
+        );
 
-      try {
-        const result = await wallet.simulateContract({
-          ...institutionV2,
-          functionName: "studentRegistration",
-          args: [
-            BigInt(data.matricNo),
-            BigInt(data.matricNo.slice(0, 4)), //assumes the year is the first 4 digits
-            data.department,
-            dataRes.url,
-            docRes.url,
-          ],
-          value: parseEther("0.001"),
-        });
+        try {
+          const result = await wallet.simulateContract({
+            ...institutionV2,
+            functionName: "studentRegistration",
+            args: [
+              data.matricNo,
+              data.name,
+              dataRes.url,
+              { name: fileName, uri: docRes.url },
+            ],
+            value: parseEther("0.001"),
+          });
 
-        const hash = await wallet.writeContract(result.request);
-        await wallet.waitForTransactionReceipt({ hash });
-      } catch (e) {
-        /**transaction failed */
-        let message = "";
-        if (e instanceof Error) message = e.message;
-        toast({
-          title: "Registration Failed",
-          description: `Student registration failed: ${message}`,
-        });
+          const hash = await wallet.writeContract(result.request);
+          await wallet.waitForTransactionReceipt({ hash });
+        } catch (error) {
+          /**transaction failed */
+          toastWithError({
+            title: "Registration Failed",
+            description: `Student registration failed`,
+            error,
+          });
+          setPending(false);
+          return;
+        }
         setPending(false);
-        return;
+
+        router.push("/student");
+      } else {
+        toast({
+          title: "Account Error",
+          description: "Student already exists",
+        });
+
+        setPending(false);
       }
-      setPending(false);
-      router.push("/student");
-    } else {
-      toast({
-        title: "Account Error",
-        description: "Student already exists",
-      });
+    } catch (error) {
+      toastWithError({ title: "Registration Error", error });
       setPending(false);
     }
   };
 
   const loginExistingUser = async () => {
-    setPending(true);
-    const wallet = await connectWallet();
+    try {
+      setPending(true);
+      const wallet = await connectWallet();
 
-    if (!wallet) {
-      toast({
-        title: "Wallet Error",
-        description: "Wallet Connection failed",
+      const isRegistered = await wallet.readContract({
+        ...institutionV2,
+        functionName: "isRegistered",
       });
-      setPending(false);
-      return;
-    }
 
-    const isRegistered = await wallet.readContract({
-      ...institutionV2,
-      functionName: "isRegistered",
-      args: [wallet.account.address],
-    });
-
-    if (isRegistered) {
-      setPending(false);
-      router.push("/student");
-    } else {
-      toast({
-        title: "Account Error",
-        description: "Student account does not exist",
+      if (isRegistered) {
+        setPending(false);
+        router.push("/student");
+      } else {
+        toast({
+          title: "Account Error",
+          description: "Student account does not exist",
+        });
+        setPending(false);
+      }
+    } catch (error) {
+      toastWithError({
+        title: "Wallet Error",
+        error,
       });
       setPending(false);
     }
@@ -151,7 +146,7 @@ const Page = () => {
               Student Sign Up
             </h3>
             <p className="text-[12px] font-SpaceGrotesk font-normal leading-[18px] tracking-[0.4px] text-secondary_text">
-              New to Payclick, create an account with few clicks
+              New to SchoolSync, create an account with few clicks
             </p>
           </div>
           <form

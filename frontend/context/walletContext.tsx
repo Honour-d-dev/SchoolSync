@@ -39,9 +39,7 @@ const getWallet = async () => {
 };
 
 type TWalletContext = {
-  connectWallet: () => Promise<
-    Awaited<ReturnType<typeof getWallet>> | undefined
-  >;
+  connectWallet: () => ReturnType<typeof getWallet>;
   wallet?: Awaited<ReturnType<typeof getWallet>>;
   account?: Address;
 };
@@ -53,7 +51,7 @@ export default function WalletProvider({ children }: PropsWithChildren) {
   const [account, setAccount] = useState<Address>();
 
   const connectWallet = useCallback(async () => {
-    if (!window.ethereum) return;
+    if (!window.ethereum) throw new Error("Wallet not detected");
 
     const wallet = await getWallet();
 

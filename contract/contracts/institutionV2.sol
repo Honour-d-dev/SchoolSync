@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity 0.8.19;
 
 /**
  * @title SchoolSync
@@ -7,133 +7,90 @@ pragma solidity ^0.8.17;
  * @notice This contract is still in development
  */
 
-contract InstitutionV2 {
-  //! Contract events
-  //? These events are emitted when certain actions are performed in the contract
-  event newStudentRegistration(address indexed _studentAddress, uint id);
-  event newAdminCreated(address indexed _adminAddress, string _name);
+import {StudentManager} from "./StudentManager.sol";
+import {AdminManager} from "./AdminManager.sol";
 
-  //! Contract Structs
-  //? This structure is created when a new student is registered
-  struct Student {
-    uint id; //matriculation number
-    string studentInfo;
-    string[] documents;
-    string department;
+contract InstitutionV2 is StudentManager, AdminManager {
+  /* ==============================================================
+                           STRUCTS
+    ==============================================================*/
+
+  /** solely used for uploading documents */
+  struct DocumentWithId {
+    string studentId;
+    Document document;
+  }
+  /**StudentCourseData */
+  struct CourseWithId {
+    string id;
+    Course course;
   }
 
-  struct Admin {
-    uint256 id;
-    string name;
-    address Address;
-    string faculty;
-    string department;
-    uint date;
-  }
-
+  /* ==============================================================
+                              STATE
+    ==============================================================*/
   string public instiutionName;
-  string public description;
-
-  uint256 public constant registrationFee = 0.001 ether;
-
   address private immutable Owner;
-  address[] public admins;
 
-  mapping(address => Student) public studentProfile;
-  mapping(string department => mapping(uint year => uint[] id)) studentIds;
-  mapping(address => Admin) public addressToAdmin;
-  mapping(address => bool) public isRegistered;
-  mapping(address => bool) public isAdmin;
+  modifier adminOrOwner() {
+    require(msg.sender == Owner || s_adminProfile[msg.sender].adminAddress == msg.sender, "not an owner or admin");
+    _;
+  }
 
-  constructor(string memory _name, string memory _description) {
+  constructor(string memory name) {
     Owner = msg.sender;
-    instiutionName = _name;
-    description = _description;
+    instiutionName = name;
   }
 
-  //! Contract Modifiers
-  modifier registrationFeeCompliance() {
-    require(msg.value >= registrationFee, "Insufficient registration fee");
-    _;
+  function uploadStudentsIdsAndDocuments(string[] calldata ids, DocumentWithId[] calldata documents) external {
+    uploadStudentIds(ids);
+    uploadStudentsDocument(documents);
   }
 
-  modifier registrationCompliance() {
-    require(!isRegistered[msg.sender], "Student has already registered");
-    _;
+  function uploadStudentsDocument(DocumentWithId[] calldata documents) public adminCompliance {
+    for (uint i; i < documents.length; i++) {
+      s_studentDocument[documents[i].studentId].push(documents[i].document);
+    }
   }
 
-  modifier adminCompliance() {
-    require(isAdmin[msg.sender], "Only admins can call this function");
-    _;
+  function uploadStudentIds(string[] calldata ids) public adminCompliance {
+    for (uint i; i < ids.length; i++) {
+      s_studentStatus[ids[i]] = StudentStatus.UNREGISTERED;
+    }
   }
 
-  modifier onlyOwner() {
-    require(msg.sender == Owner, "only owners can call this function");
-    _;
-  }
-
-  //? This function registers a new student and creats a contract profile;
-  function studentRegistration(
-    uint id,
-    uint year,
-    string calldata _department,
-    string calldata studentInfoHash,
-    string calldata studentIdCardHash
-  ) external payable registrationCompliance registrationFeeCompliance {
-    // require(isValidStudentId(id, year, _department), "Invalid user Id");
-    (year);
-
-    Student memory newStudent;
-    newStudent.id = id;
-    newStudent.department = _department;
-    newStudent.studentInfo = studentInfoHash;
-
-    studentProfile[msg.sender] = newStudent;
-    studentProfile[msg.sender].documents.push(studentIdCardHash);
-
-    isRegistered[msg.sender] = true;
-
-    emit newStudentRegistration(msg.sender, newStudent.id);
-  }
-
-  function getStudent() external view returns (Student memory) {
-    return studentProfile[msg.sender];
-  }
-
-  function isValidStudentId(uint id, uint year, string memory department) public view returns (bool isValid) {
-    uint[] memory ids = studentIds[department][year];
-
-    for (uint i = 0; i < ids.length; i++) {
-      if (id == ids[i]) {
-        isValid = true;
-        break;
+  function uploadAcademicData(
+    uint8 level,
+    Semester semester,
+    CourseWithId[] calldata courses
+  ) external adminCompliance {
+    if (semester == Semester.FIRST) {
+      for (uint i; i < courses.length; i++) {
+        Session[] storage session = s_studentAcademicData[courses[i].id];
+        /**level > session legth indicates a missing session */
+        if (level > session.length) revert();
+        /**level == session length assumes a new session is implied */
+        if (level == session.length) session.push();
+        session[level].firstSemester.push(courses[i].course);
+      }
+    } else {
+      for (uint i; i < courses.length; i++) {
+        Session[] storage session = s_studentAcademicData[courses[i].id];
+        /**new session cannot be created in second semester */
+        if (level >= session.length) revert();
+        session[level].secondSemester.push(courses[i].course);
       }
     }
   }
 
-  function registerAdmin(
-    string memory _name,
-    string memory _faculty,
-    string memory _department,
-    address _address
-  ) external onlyOwner adminCompliance {
-    Admin memory newAdmin = Admin({
-      id: admins.length,
-      name: _name,
-      Address: _address,
-      faculty: _faculty,
-      department: _department,
-      date: block.timestamp
-    });
-
-    isAdmin[_address] = true;
-    admins.push(_address);
-    addressToAdmin[_address] = newAdmin;
-
-    emit newAdminCreated(_address, _name);
+  function getStudentData() external view returns (Student memory, Document[] memory, Session[] memory) {
+    string memory id = s_addressToId[msg.sender];
+    return _getStudentData(id);
   }
 
-  function uploadStudentIds(string calldata department, uint year, uint[] calldata ids) external adminCompliance {
-    studentIds[department][year] = ids;
+  function getStudentDataFor(
+    string calldata studentId
+  ) external view adminCompliance returns (Student memory, Document[] memory, Session[] memory) {
+    return _getStudentData(studentId);
   }
 }
