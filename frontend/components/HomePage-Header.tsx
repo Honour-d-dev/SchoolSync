@@ -3,7 +3,7 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useWallet } from "@/context/walletContext";
 
-export const Header = ({ name }: { name?: string }) => {
+export const Header = ({ name, id }: { name?: string; id?: string }) => {
   const { account } = useWallet();
   return (
     <div className="grid grid-cols-5">
@@ -32,6 +32,7 @@ export const Header = ({ name }: { name?: string }) => {
           </PopoverTrigger>
           <PopoverContent className="flex flex-col w-fit items-center font-Inconsolata bg-white">
             <div>{name}</div>
+            <div>{id}</div>
             <div>{`${account?.slice(0, 5)}...${account?.slice(-5)}`}</div>
           </PopoverContent>
         </Popover>

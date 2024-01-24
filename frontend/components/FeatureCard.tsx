@@ -1,6 +1,6 @@
-import React from 'react';
-import Image from 'next/image';
-import LearnMoreButton from './LearnMoreButton';
+import React from "react";
+import Image from "next/image";
+import LearnMoreButton from "./LearnMoreButton";
 
 type FeatureCardProps = {
   img: string;
@@ -11,7 +11,7 @@ type FeatureCardProps = {
 const FeatureCard = ({ img, title, description }: FeatureCardProps) => {
   return (
     <section className="flex flex-row gap-[32px] items-center mt-[49px]">
-      <div>
+      <div className=" aspect-square rounded-[100px] border border-primary-400 overflow-hidden">
         <Image
           src={img}
           alt="feature-1"

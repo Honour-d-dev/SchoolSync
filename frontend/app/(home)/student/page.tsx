@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import StudentProfile from "@/components/StudentProfile";
 import Grades from "@/components/Grades";
 import Transcript from "@/components/Transcript";
+import Dashboard from "@/components/studentDashboard";
 
 export default function Student() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -71,7 +72,7 @@ export default function Student() {
     <div className="bg-white w-screen h-screen flex flex-row">
       <SideMenu value={activeTab} setValue={setActiveTab} />
       <div className="flex flex-col justify-start p-6 w-full">
-        <Header name={studentInfo?.name} />
+        <Header name={studentInfo?.name} id={studentInfo?.matricNo} />
         {/* content */}
         {activeTab === "student records" ? (
           <div className="grid p-6 gap-2 grid-cols-2 md:grid-cols-4 w-full">
@@ -79,23 +80,28 @@ export default function Student() {
               return (
                 <Dialog key={doc.uri}>
                   <DialogTrigger asChild>
-                    <div className="relative">
-                      <Image
-                        src={doc.uri}
-                        alt="document"
-                        width={500}
-                        height={700}
-                        className="rounded p-2 w-full border border-gray-300"
-                      />
-                      <a
-                        className="absolute bottom-2 right-2 scale-90 hover:scale-110 opacity-80 transition-transform ease-in-out duration-300"
-                        /**prevent from triggering the dialog */
-                        onClick={(e) => e.stopPropagation()}
-                        href={getDownloadUrl(doc.uri, "schoolsync.jpg")}
-                        download
-                      >
-                        <Download />
-                      </a>
+                    <div>
+                      <div className="relative">
+                        <Image
+                          src={doc.uri}
+                          alt="document"
+                          width={500}
+                          height={700}
+                          className="rounded p-2 w-full border border-gray-300"
+                        />
+                        <a
+                          className="absolute bottom-2 right-2 scale-90 hover:scale-110 opacity-80 transition-transform ease-in-out duration-300"
+                          /**prevent from triggering the dialog */
+                          onClick={(e) => e.stopPropagation()}
+                          href={getDownloadUrl(doc.uri, doc.name)}
+                          download
+                        >
+                          <Download className="bg-white rounded-md" />
+                        </a>
+                      </div>
+                      <span className="overflow-hidden text-ellipsis font-Inconsolat font-semibold flex justify-center items-center">
+                        {doc.name}
+                      </span>
                     </div>
                   </DialogTrigger>
                   <DialogContent className="p-4 bg-gray-200">
@@ -106,26 +112,7 @@ export default function Student() {
             })}
           </div>
         ) : null}
-        {activeTab === "dashboard" ? (
-          <div className="flex flex-col w-full h-full">
-            <h1 className="self-start font-semibold text-3xl">
-              Welcome to SchoolSync
-            </h1>
-            <div className="h-full w-full flex justify-center items-center flex-col">
-              <div className="flex flex-col items-center">
-                <Image
-                  src={fileImg}
-                  alt="no files"
-                  className="h-[350px] w-[350px]"
-                />
-                <span>No records yet</span>
-              </div>
-              <span className="mt-8">
-                Go to Profile to fill in your required information
-              </span>
-            </div>
-          </div>
-        ) : null}
+        {activeTab === "dashboard" ? <Dashboard /> : null}
         {activeTab === "profile" ? (
           <StudentProfile studentInfo={studentInfo!} />
         ) : null}
