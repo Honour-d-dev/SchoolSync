@@ -59,22 +59,22 @@ export default function Transcript({
   };
   return (
     <div className="flex justify-start items-center pt-16 flex-col relative p-16 h-[90%]">
-      <div className="overflow-y-auto max-h-[90%]">
+      <div className="overflow-y-auto max-h-[90%] w-full">
         <table>
           <tbody>
             <tr>
-              <th className="border border-black p-2 pl-3">Student Name</th>
-              <td className="border border-black p-2 pl-3">{name}</td>
-              <td className="border border-black p-2 pl-3"></td>
-              <td className="border border-black p-2 pl-3"></td>
-              <td className="border border-black p-2 pl-3"></td>
+              <th className="border border-black p-2 px-8">Student Name</th>
+              <td className="border border-black p-2 px-8">{name}</td>
+              <td className="border border-black p-2 px-8"></td>
+              <td className="border border-black p-2 px-8"></td>
+              <td className="border border-black p-2 px-8"></td>
             </tr>
             <tr>
-              <th className="border border-black p-2 pl-3">Student ID</th>
-              <td className="border border-black p-2 pl-3">{id}</td>
-              <td className="border border-black p-2 pl-3"></td>
-              <td className="border border-black p-2 pl-3"></td>
-              <td className="border border-black p-2 pl-3"></td>
+              <th className="border border-black p-2 px-8">Student ID</th>
+              <td className="border border-black p-2 px-8">{id}</td>
+              <td className="border border-black p-2 px-8"></td>
+              <td className="border border-black p-2 px-8"></td>
+              <td className="border border-black p-2 px-8"></td>
             </tr>
             <tr>
               <td className="border border-black p-4"></td>
@@ -96,19 +96,19 @@ export default function Transcript({
                 session.firstSemester.map((course) => {
                   return (
                     <tr key={course.courseCode}>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.courseCode}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.courseTitle}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.score}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.unit}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.score >= 75
                           ? "A"
                           : course.score >= 60
@@ -123,30 +123,30 @@ export default function Transcript({
                   );
                 }),
                 <tr key={`${index}0`}>
-                  <td className="border border-black p-2 pl-3"></td>
-                  <td className="border border-black p-2 pl-3"></td>
-                  <td className="border border-black p-2 pl-3"></td>
-                  <th className="border border-black p-2 pl-3">GPA</th>
-                  <td className="border border-black p-2 pl-3">
+                  <td className="border border-black p-2 px-8"></td>
+                  <td className="border border-black p-2 px-8"></td>
+                  <td className="border border-black p-2 px-8"></td>
+                  <th className="border border-black p-2 px-8">GPA</th>
+                  <td className="border border-black p-2 px-8">
                     {gpa.firstGPA.toFixed(2)}
                   </td>
                 </tr>,
                 session.secondSemester.map((course) => {
                   return (
                     <tr key={course.courseCode}>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.courseCode}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.courseTitle}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.score}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.unit}
                       </td>
-                      <td className="border border-black p-2 pl-3">
+                      <td className="border border-black p-2 px-8">
                         {course.score >= 75
                           ? "A"
                           : course.score >= 60

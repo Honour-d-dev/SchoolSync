@@ -9,7 +9,6 @@ const hre = require("hardhat");
 async function main() {
   const institution = await hre.ethers.deployContract("InstitutionV2", [
     "futo",
-    "nothing",
   ]);
   await institution.waitForDeployment();
   console.log(institution.target);

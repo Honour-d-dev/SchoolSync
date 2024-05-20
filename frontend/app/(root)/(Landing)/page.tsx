@@ -173,9 +173,9 @@ const Page = () => {
           />
           <div className="lg:mt-[280px]   flex items-center">
             <FeatureCard
-              img="/icons/Feature4.png"
-              title="NFT services"
-              description="Providing unique digital tokens for academic achievements, creating a verifiable and tradable record of a student's accomplishments, thereby offering a modern and innovative approach to recognizing achievements"
+              img="/icons/Data-analytics.png"
+              title="Reports and Analytics"
+              description="Empowers administrators by providing in-depth insights into academic performance, enrolment trends, and institutional metrics. Utilizing data-driven analytics and comprehensive reporting,it identifies areas for improvement, and enhances overall efficiency."
             />
           </div>
         </MotionDiv>

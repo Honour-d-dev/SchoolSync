@@ -197,6 +197,14 @@ export default function StudentProfile({
                 </td>
               </tr>
               <tr>
+                <td>Student ID</td>
+                <td>
+                  <div className="p-1 border border-gray-700 rounded-lg px-4 font-Inconsolata w-full">
+                    {studentInfo?.matricNo}
+                  </div>
+                </td>
+              </tr>
+              <tr>
                 <td>Contact</td>
                 <td>
                   <div className="p-1 border border-gray-700 rounded-lg px-4 font-Inconsolata w-full">
@@ -207,10 +215,10 @@ export default function StudentProfile({
             </tbody>
           </table>
         </div>
-        <div className="flex w-full flex-row justify-end">
+        <div className="grid grid-rows-1 grid-cols-6 w-full justify-end">
           <button
             onClick={() => setEditProfile(true)}
-            className="rounded-[12px] shadow-md shadow-black bg-accent-300 p-2 px-8"
+            className="rounded-[12px] shadow-md shadow-black bg-accent-300 p-2 px-8 col-start-3"
           >
             edit profile
           </button>
